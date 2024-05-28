@@ -9,6 +9,9 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
+    },
+    userName: {
+      type: String,
       required: true,
     },
     imageUrl: {
