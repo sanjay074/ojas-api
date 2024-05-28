@@ -35,7 +35,7 @@ app.use("/api/auth",Auth);
 
 
 
-var PORT = process.env.PORT || 5000;
+var PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`A Node Js API is listening on port: ${PORT}`);
 });
