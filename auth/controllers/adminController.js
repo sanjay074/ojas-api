@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const AdminUser = require("../models/adminUser");
+const User = require("../models/user");
 const {registrationAdminUserSchema,adminUserLoginSchema}= require("../../validators/authValidator");
 
 exports.registrationUser = async (req, res) => {
@@ -65,4 +66,39 @@ exports.registrationUser = async (req, res) => {
             message: error.toString(),
           });
     }
+
+
   }; 
+
+  exports.getAllUser = async (req, res) => {
+    try {
+      const { page, limit } = req.query;
+      const skip = (page - 1) * 10;
+      const getAllUser = await User.find().skip(skip).limit(limit).select('-password');
+      res.status(200).json({status:1, message: "Find all  user list ", getAllUser});
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        message: error.toString(),
+      });
+    }
+  };
+
+
+  exports.searchOneUser = async (req, res) => {
+    try {
+      console.log(req.params.key);
+      const searchuser = await User.find({
+        $or: [
+          { name: { $regex: req.params.key } },
+          { userName: { $regex: req.params.key } },
+        ],
+      });
+      res.status(200).json({status:1, message: "Search user sucessfully ", searchuser});
+    } catch (err) {
+        return res.status(500).json({
+            status: 0,
+            message: error.toString(),
+          });
+    }
+  };
