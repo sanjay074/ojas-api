@@ -38,9 +38,19 @@ const adminUserLoginSchema =Joi.object({
   password: passwordSchema,
 })
 
+const addCouresSchema =Joi.object({
+  couresName: Joi.string().required(),
+  sellPrice:Joi.number().required(),
+  totalPrice:Joi.number().required(),
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+  type: Joi.string().valid("free", "paid").default("free"),
+})
+
 module.exports={
 registrationUserSchema,
 userLoginSchema,
 registrationAdminUserSchema,
-adminUserLoginSchema
+adminUserLoginSchema,
+addCouresSchema
 }
