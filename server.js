@@ -23,6 +23,7 @@ mongoose.connection.on("error", (err) => {
 
 
 const Auth = require("./auth/routes/user");
+const AdminAuth = require("./auth/routes/admin");
 
 
 // middleware
@@ -32,6 +33,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use("/api/auth",Auth);
+app.use("/api/auth",AdminAuth)
 
 
 

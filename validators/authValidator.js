@@ -24,7 +24,23 @@ const userLoginSchema =Joi.object({
   password: passwordSchema,
 })
 
+
+
+const registrationAdminUserSchema = Joi.object({
+  email: Joi.string().required(),
+  userName:Joi.string(),
+  password: passwordSchema,
+});
+
+
+const adminUserLoginSchema =Joi.object({
+  email: Joi.string(),
+  password: passwordSchema,
+})
+
 module.exports={
 registrationUserSchema,
-userLoginSchema
+userLoginSchema,
+registrationAdminUserSchema,
+adminUserLoginSchema
 }

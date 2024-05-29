@@ -24,6 +24,29 @@ const verifyToken = (req, res, next) => {
     }
   };
 
+  const verifyTokenAndAdmin = (req, res, next) => {
+    verifyToken(req, res, () => {
+      if (req.user.isAdmin) {
+        next();
+      } else {
+        return res.status(401).json({status:0 ,message:"You are not admin user"});
+      }
+    });
+  };
+
+  
+  const verifyTokenAndUser = async (req, res, next) => {
+    const user = await UserDetaills.findById(req.user._id);
+    console.log(user);
+    if (!user) {
+      return res.status(401).json({status:0,message:"You are not  user."});
+    } else {
+      next();
+    }
+  };
+
  module.exports={
-    verifyToken
+    verifyToken,
+    verifyTokenAndAdmin,
+    verifyTokenAndUser
  } 
