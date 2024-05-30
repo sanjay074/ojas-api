@@ -26,7 +26,7 @@ exports.addCoures = async (req,res)=>{
      })
 
      const saveData = await addCoures.save();
-      return res.status(200).json({status:1, message:"New coures created  sucessfully"});
+      return res.status(201).json({status:1, message:"New coures created  sucessfully"});
     }catch(error){
         return res.status(500).json({
             status:0,
@@ -87,3 +87,24 @@ exports.getAllCoures = async (req, res) => {
       });
     }
   };
+
+exports.updateCoures = async (req,res)=>{
+  try{
+  const courseId = req.params.id;
+  if(!mongoose.Types.ObjectId.isValid(courseId)){
+    return res.status(400).json({ status: 0, message: "Invalid course ID" });
+  }
+  const updateCoures = await Coures.findByIdAndUpdate(courseId,{$set:req.body},{new:true});
+  return res.status(200).json({
+    status: 1,
+    message: "Coures data update successfully",
+    updateCoures,
+  });
+  }catch(error){
+     return res.status(500).json({
+       status:0,
+       message:error.toString(),
+     })
+  }
+}
+

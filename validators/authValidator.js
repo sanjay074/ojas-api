@@ -47,10 +47,21 @@ const addCouresSchema =Joi.object({
   type: Joi.string().valid("free", "paid").default("free"),
 })
 
+
+const addClassSchema =Joi.object({
+  couresId: Joi.string().required(),
+  classNo:Joi.number().required(),
+  description:Joi.number().required(),
+  classyoutubelink: Joi.string().required(),
+  description: Joi.string().required(),
+  videoWatchTime:Joi.string().required()
+})
+
 module.exports={
 registrationUserSchema,
 userLoginSchema,
 registrationAdminUserSchema,
 adminUserLoginSchema,
-addCouresSchema
+addCouresSchema,
+addClassSchema
 }
