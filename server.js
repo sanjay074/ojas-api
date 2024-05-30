@@ -22,9 +22,10 @@ mongoose.connection.on("error", (err) => {
 });
 
 
-const Auth = require("./auth/routes/user");
-const AdminAuth = require("./auth/routes/admin");
-const Coures = require("./auth/routes/coures");
+const Auth = require("./User/routes/user");
+const AdminAuth = require("./User/routes/admin");
+const Coures = require("./User/routes/coures");
+const Class = require("./User/routes/class");
 
 // middleware
 app.use(helmet());
@@ -33,8 +34,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use("/api/auth",Auth);
-app.use("/api/auth",AdminAuth)
+app.use("/api/auth",AdminAuth);
 app.use("/api",Coures);
+app.use("/api",Class);
 
 
 
