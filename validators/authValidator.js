@@ -57,11 +57,20 @@ const addClassSchema =Joi.object({
   videoWatchTime:Joi.string().required()
 })
 
+
+const ratingSchema =Joi.object({
+  courseId: Joi.string().required(),
+  userId: Joi.string().required(),
+  rating: Joi.number().integer().min(1).max(5).required(),
+  review: Joi.string().optional()
+})
+
 module.exports={
 registrationUserSchema,
 userLoginSchema,
 registrationAdminUserSchema,
 adminUserLoginSchema,
 addCouresSchema,
-addClassSchema
+addClassSchema,
+ratingSchema
 }
