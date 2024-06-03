@@ -26,6 +26,7 @@ const Auth = require("./User/routes/user");
 const AdminAuth = require("./User/routes/admin");
 const Coures = require("./User/routes/coures");
 const Class = require("./User/routes/class");
+const Rating = require("./User/routes/rating");
 
 // middleware
 app.use(helmet());
@@ -37,6 +38,7 @@ app.use("/api/auth",Auth);
 app.use("/api/auth",AdminAuth);
 app.use("/api",Coures);
 app.use("/api",Class);
+app.use("/api",Rating);
 
 
 
