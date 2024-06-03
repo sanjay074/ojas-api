@@ -1,9 +1,8 @@
 const Rating = require("../models/rating");
-const  {ratingSchema} = require("../../validators/authValidator");
+const  {ratingSchema,upadteRatingSchema} = require("../../validators/authValidator");
 const mongoose = require("mongoose");
 
 // Add a new rating
-
 exports.userRating = async (req,res)=>{
     try{
      const {error} = ratingSchema.validate(req.body);
@@ -56,4 +55,30 @@ exports.getCouresAverageRating  = async (req,res)=>{
         }) 
     }
 }
+
+
+// User upadte rating api 
+exports.userUpadteRating = async (req,res)=>{
+        const {error} = upadteRatingSchema.validate(req.body);
+        if(error){
+            return res.status(400).json({message:error.details[0].message});
+        }
+        console.log(req.params.id);
+        try{
+        const rating = await Rating.findById(req.params.id);
+        if(!rating){
+            return res.status(400).json({status:0,message:"Rating not found"})
+        }
+      rating.rating = req.body.rating;
+      rating.review = req.body.review;
+      const updatedRating = await rating.save();
+        return res.status(200).json({status:0,message:"User update rating api sucessfully"})
+       }catch(error){
+        return res.status(500).json({
+            status:0,
+            message:error.message.toString(),
+        }) 
+       }
+
+    }
 

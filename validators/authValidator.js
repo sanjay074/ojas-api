@@ -65,6 +65,11 @@ const ratingSchema =Joi.object({
   review: Joi.string().optional()
 })
 
+const upadteRatingSchema =Joi.object({
+  rating: Joi.number().integer().min(1).max(5).required(),
+  review: Joi.string().optional()
+})
+
 module.exports={
 registrationUserSchema,
 userLoginSchema,
@@ -72,5 +77,6 @@ registrationAdminUserSchema,
 adminUserLoginSchema,
 addCouresSchema,
 addClassSchema,
-ratingSchema
+ratingSchema,
+upadteRatingSchema
 }
