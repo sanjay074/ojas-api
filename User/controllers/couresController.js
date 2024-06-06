@@ -68,6 +68,37 @@ exports.getAllCoures = async (req, res) => {
     }
   };
 
+  exports.getAllFreeCoures = async (req,res)=>{
+    try{
+      const freeCourses = (await Coures.find({type:"free"},{createdAt:0,updatedAt:0,_id:0,__v:0}));
+      if(freeCourses.length===0){
+        return res.status(400).json({status:0,message:"No free courses available"})
+      }
+      return res.status(200).json({message:"Find all free course list sucessfully",freeCourses})
+    }catch(error){
+      return res.status(500).json({
+        status: 0,
+        message: error.toString(),
+      });
+    }
+  }
+
+
+exports.getAllpaidCoures = async (req,res)=>{
+    try{
+      const paidCourses = (await Coures.find({type:"paid"},{createdAt:0,updatedAt:0,_id:0,__v:0}));
+      if(paidCourses.length===0){
+        return res.status(400).json({status:0,message:"No paid courses available"})
+      }
+      return res.status(200).json({message:"Find all paid course list sucessfully",paidCourses})
+    }catch(error){
+      return res.status(500).json({
+        status: 0,
+        message: error.toString(),
+      });
+    }
+  }
+
 
   exports.deleteCoures = async (req, res) => {
     try {

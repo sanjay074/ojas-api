@@ -57,13 +57,16 @@ exports.getCouresAverageRating  = async (req,res)=>{
 }
 
 
-// User upadte rating api 
+//User upadte rating api 
 exports.userUpadteRating = async (req,res)=>{
         const {error} = upadteRatingSchema.validate(req.body);
         if(error){
             return res.status(400).json({message:error.details[0].message});
         }
-        console.log(req.params.id);
+        const ratingId = req.params.id;
+        if(!mongoose.Types.ObjectId.isValid(ratingId)){
+            return res.status(400).json({ status: 0, message: "Invalid ID"});
+        }
         try{
         const rating = await Rating.findById(req.params.id);
         if(!rating){
@@ -82,3 +85,4 @@ exports.userUpadteRating = async (req,res)=>{
 
     }
 
+    
