@@ -12,7 +12,7 @@ exports.addCoures = async (req,res)=>{
      const exist = await Coures.findOne({couresName});
      if(exist){
         return res.status(400).json({
-            status:0,
+            success:false,
             message:"This coures name is already taken!"
         })
      }
@@ -26,7 +26,7 @@ exports.addCoures = async (req,res)=>{
      })
 
      const saveData = await addCoures.save();
-      return res.status(201).json({status:1, message:"New coures created  sucessfully"});
+      return res.status(201).json({success:true, message:"New coures created  sucessfully"});
     }catch(error){
         return res.status(500).json({
             status:0,
@@ -40,7 +40,7 @@ exports.getAllCoures = async (req, res) => {
       const { page, limit } = req.query;
       const skip = (page - 1) * 10;
       const getAllCoures = await Coures.find().skip(skip).limit(limit);
-      res.status(200).json({status:1, message: "Find all  coures list ", getAllCoures});
+      res.status(200).json({success:true, message: "Find all  coures list ", getAllCoures});
     } catch (error) {
       return res.status(500).json({
         status: 0,
@@ -48,6 +48,7 @@ exports.getAllCoures = async (req, res) => {
       });
     }
   };
+
 
   exports.getOneCoures = async (req, res) => {
     try {
@@ -57,7 +58,7 @@ exports.getAllCoures = async (req, res) => {
         }  
       const getOneCoures = await Coures.findById(req.params.id);
       if(!getOneCoures){
-        return res.status(400).json({status:0,message:"Course not found with this ID"})
+        return res.status(400).json({success:false,message:"Course not found with this ID"})
       }
       res.status(200).json({status:1, message: "Find all  coures list ",getOneCoures});
     } catch (error) {
@@ -67,19 +68,51 @@ exports.getAllCoures = async (req, res) => {
       });
     }
   };
+  
+
+  exports.getAllFreeCoures = async (req,res)=>{
+    try{
+      const freeCourses = (await Coures.find({type:"free"},{createdAt:0,updatedAt:0,_id:0,__v:0}));
+      if(freeCourses.length===0){
+        return res.status(400).json({success:false,message:"No free courses available"})
+      }
+      return res.status(200).json({message:"Find all free course list sucessfully",freeCourses})
+    }catch(error){
+      return res.status(500).json({
+        status: 0,
+        message: error.toString(),
+      });
+    }
+  }
+
+
+exports.getAllpaidCoures = async (req,res)=>{
+    try{
+      const paidCourses = (await Coures.find({type:"paid"},{createdAt:0,updatedAt:0,_id:0,__v:0}));
+      if(paidCourses.length===0){
+        return res.status(400).json({success:false,message:"No paid courses available"})
+      }
+      return res.status(200).json({success:true,message:"Find all paid course list sucessfully",paidCourses})
+    }catch(error){
+      return res.status(500).json({
+        status: 0,
+        message: error.toString(),
+      });
+    }
+  }
 
 
   exports.deleteCoures = async (req, res) => {
     try {
     const courseId = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
-         return res.status(400).json({ status: 0, message: "Invalid course ID" });
+         return res.status(400).json({ success:false, message: "Invalid course ID" });
         }  
       const getOneCoures = await Coures.findByIdAndDelete(req.params.id);
       if(!getOneCoures){
-        return res.status(400).json({status:0,message:"Course not found with this ID"})
+        return res.status(400).json({success:false,message:"Course not found with this ID"})
       }
-      res.status(200).json({status:1, message: "Couress delete sucessfully"});
+      res.status(200).json({success:true, message: "Couress delete sucessfully"});
     } catch (error) {
       return res.status(500).json({
         status: 0,
@@ -92,11 +125,11 @@ exports.updateCoures = async (req,res)=>{
   try{
   const courseId = req.params.id;
   if(!mongoose.Types.ObjectId.isValid(courseId)){
-    return res.status(400).json({ status: 0, message: "Invalid course ID" });
+    return res.status(400).json({ success:false, message: "Invalid course ID" });
   }
   const updateCoures = await Coures.findByIdAndUpdate(courseId,{$set:req.body},{new:true});
   return res.status(200).json({
-    status: 1,
+    success:true,
     message: "Coures data update successfully",
     updateCoures,
   });

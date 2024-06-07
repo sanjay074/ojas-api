@@ -1,8 +1,34 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const twilio = require('twilio');
 const User = require("../models/user");
 const {registrationUserSchema,userLoginSchema} = require("../../validators/authValidator");
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
+//Ensure phone numbers are in E.164 format
+const formatPhoneNumber = (phoneNumber) => {
+  // Add your logic to prepend country code based on your requirements
+  // Here, we're assuming country code +91 for India
+  return phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
+};
+
+
+exports.loginWithPhone = async (req,res)=>{
+  try{
+    const { phoneNumber } = req.body;
+    const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+    twilioClient.verify.v2.services(process.env.TWILIO_SERVICE_SID)
+        .verifications
+        .create({ to: formattedPhoneNumber, channel: 'sms' })
+        .then(verification => res.status(200).send({ success: true, message: 'OTP sent successfully' }))
+        .catch(error => res.status(500).send({ success: false, message: error.message }));
+  }catch(error){
+    return res.status(500).json({
+      status: 0,
+      message: error.toString(),
+    });
+ }
+  }
 
 exports.registrationUser = async (req, res) => {
    try{
