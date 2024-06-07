@@ -17,7 +17,7 @@ exports.loginWithPhone = async (req,res)=>{
   try{
     const { phoneNumber } = req.body;
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
-    twilioClient.verify.services(process.env.TWILIO_SERVICE_SID)
+    twilioClient.verify.v2.services(process.env.TWILIO_SERVICE_SID)
         .verifications
         .create({ to: formattedPhoneNumber, channel: 'sms' })
         .then(verification => res.status(200).send({ success: true, message: 'OTP sent successfully' }))

@@ -11,23 +11,23 @@ exports.userRating = async (req,res)=>{
      }
      const {courseId,userId,rating,review} = req.body;
      if(!mongoose.Types.ObjectId.isValid(courseId)){
-        return res.status(400).json({ status: 0, message: "Invalid course ID" });
+        return res.status(400).json({ success:false, message: "Invalid course ID" });
      }
      if(!mongoose.Types.ObjectId.isValid(userId)){
-        return res.status(400).json({ status: 0, message: "Invalid user Id" });
+        return res.status(400).json({ success:false, message: "Invalid user Id" });
      }
      const existingRating = await Rating.findOne({
         courseId: req.body.courseId,
         userId: req.body.userId
       });
       if(existingRating){
-        return res.status(400).json({ message: 'User has already rated this course' });
+        return res.status(400).json({success:false, message: 'User has already rated this course' });
       }
       const addRating = new Rating ({
         courseId,userId,rating,review
       }) 
       const saveRating = await addRating.save();
-      return res.status(201).json({status:1,message:"User add rating sucessfully"})
+      return res.status(201).json({success:true,message:"User add rating sucessfully"})
     }catch(error){
         return res.status(500).json({
             status:0,
@@ -42,11 +42,11 @@ exports.getCouresAverageRating  = async (req,res)=>{
     try{
         const courseId = req.params.id;
         if(!mongoose.Types.ObjectId.isValid(courseId)){
-            return res.status(400).json({ status: 0, message: "Invalid course ID" });
+            return res.status(400).json({ success:false, message: "Invalid course ID" });
         }
         const ratings = await Rating.find({ courseId});
         const average = ratings.reduce((acc, rating) => acc + rating.rating, 0) / ratings.length;
-        return res.status(200).json({status:1,message:"Get average rating for a course",average})
+        return res.status(200).json({success:true,message:"Get average rating for a course",average})
 
     }catch(error){
         return res.status(500).json({
@@ -65,17 +65,17 @@ exports.userUpadteRating = async (req,res)=>{
         }
         const ratingId = req.params.id;
         if(!mongoose.Types.ObjectId.isValid(ratingId)){
-            return res.status(400).json({ status: 0, message: "Invalid ID"});
+            return res.status(400).json({ success:false, message: "Invalid ID"});
         }
         try{
         const rating = await Rating.findById(req.params.id);
         if(!rating){
-            return res.status(400).json({status:0,message:"Rating not found"})
+            return res.status(400).json({success:false,message:"Rating not found"})
         }
       rating.rating = req.body.rating;
       rating.review = req.body.review;
       const updatedRating = await rating.save();
-        return res.status(200).json({status:0,message:"User update rating api sucessfully"})
+        return res.status(200).json({success:true,message:"User update rating api sucessfully"})
        }catch(error){
         return res.status(500).json({
             status:0,
