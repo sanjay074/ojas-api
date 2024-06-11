@@ -18,6 +18,12 @@ const registrationUserSchema = Joi.object({
   password: passwordSchema,
 });
 
+const userUpdateProfileSchema = Joi.object({
+  name: Joi.string().required(),
+  userName:Joi.string().required(),
+  email: Joi.string().required(),
+})
+
 const userLoginSchema =Joi.object({
   userName:Joi.string(),
   email: Joi.string(),
@@ -70,6 +76,24 @@ const upadteRatingSchema =Joi.object({
   review: Joi.string().optional()
 })
 
+const otpSchema = Joi.object()
+  .keys({
+    details: Joi.string().required(),
+    otp: Joi.number().max(999999).required(),
+    phone: Joi.string()
+      .regex(/^[6-9]{1}[0-9]{9}$/)
+      .required(),
+  })
+  .required();
+
+const phoneSchema = Joi.object()
+  .keys({
+    phone: Joi.string()
+      .regex(/^[6-9]{1}[0-9]{9}$/)
+      .required(),
+  })
+  .required();
+
 module.exports={
 registrationUserSchema,
 userLoginSchema,
@@ -78,5 +102,8 @@ adminUserLoginSchema,
 addCouresSchema,
 addClassSchema,
 ratingSchema,
-upadteRatingSchema
+upadteRatingSchema,
+phoneSchema,
+otpSchema,
+userUpdateProfileSchema
 }

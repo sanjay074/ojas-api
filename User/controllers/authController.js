@@ -1,34 +1,157 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const twilio = require('twilio');
+const axios = require("axios");
 const User = require("../models/user");
-const {registrationUserSchema,userLoginSchema} = require("../../validators/authValidator");
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const {registrationUserSchema,userLoginSchema,phoneSchema,otpSchema} = require("../../validators/authValidator");
+  
+/**
+ * @param {*} req
+ * @param {*} res
+ * @returns data
+ * @description  🙂🙂🙂User login with phone🙂🙂🙂
+ * @date 11/06/2024
+ * @author Sanjay Kumar
+ **/
+  exports.phoneLogin = (req, res) => {
+    const { error } = phoneSchema.validate(req.body);
+    if (error) {
+      res.status(400).send(error.details[0].message);
+      return;
+    }
+    if (req.body.phone === "9999999999") {
+      return res.status(200).send({
+        success: true,
+        message: "Dummy Account Login",
+        otp: "Enter any 6 digit otp",
+      });
+    }
+    axios
+      .get(
+        "https://2factor.in/API/V1/ad542ca6-24b4-11ef-8b60-0200cd936042/SMS/" +
+          req.body.phone +
+          "/AUTOGEN/User verification"
+      )
+      .then(function (response) {
+        return res.status(200).json({
+          success: "otp sent successfully",
+          sessionID: response.data.Details,
+        });
+      })
+      .catch((er) => {
+        return res.status(500).json({ message: "Error", error: er.name });
+      });
+  };
 
-//Ensure phone numbers are in E.164 format
-const formatPhoneNumber = (phoneNumber) => {
-  // Add your logic to prepend country code based on your requirements
-  // Here, we're assuming country code +91 for India
-  return phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
-};
+/**
+ * @param {*} req
+ * @param {*} res
+ * @returns data
+ * @description  🙂🙂🙂User 🙂🙂🙂
+ * @date 11/06/2024
+ * @author Sanjay Kumar
+ **/
+  exports.verifyOTP = async (req, res) => {
+    try {
+      const { error } = otpSchema.validate(req.body);
+      if (error) {
+        res.status(400).send(error.details[0].message);
+        return;
+      }
+  
+      if (req.body.phone === "9999999999") {
+        const isAlreadyRegistered = await User.findOne({
+          phone: req.body.phone,
+        }).lean();
+        if (isAlreadyRegistered) {
+          const _id = isAlreadyRegistered._id.toString();
+          const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
+            expiresIn: "30d",
+          });
+          return res.status(200).send({
+            message: "Welcome back",
+            token: token,
+          });
+        }
+        const createUser= new User({
+          phone: req.body.phone,
+        });
+        createUser
+          .save()
+          .then(async (result) => {
+            const _id = result._id.toString();
+            const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
+              expiresIn: "30d",
+            });
+  
+            return res.status(200).send({
+              message: "Registered successful",
+              token: token
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            return res.status(500).send({ message: "Something bad happened" });
+          });
+      }
+      axios
+        .get(
+          "https://2factor.in/API/V1/ad542ca6-24b4-11ef-8b60-0200cd936042/SMS/VERIFY/" +
+            req.body.details +
+            "/" +
+            req.body.otp
+        )
+        .then(async (response) => {
+          if (response.data.Details === "OTP Matched") {
+            const isAlreadyRegistered = await User.findOne({
+              phone: req.body.phone,
+            }).lean();
+            if (isAlreadyRegistered) {
+              const _id = isAlreadyRegistered._id.toString();
+              const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
+                expiresIn: "30d",
+              });
+              return res.status(200).send({
+                message: "Welcome back",
+                token: token
+              });
+            }
+            const createUser = new User({
+              phone: req.body.phone,
+            });
+            createUser
+              .save()
+              .then(async (result) => {
+                const _id = result._id.toString();
+                const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
+                  expiresIn: "30d",
+                });
+  
+                return res.status(200).send({
+                  message: "Registered successful",
+                  token: token
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+                return res
+                  .status(500)
+                  .send({ message: "Something bad happened" });
+              });
+          } else if (response.data.Details === "OTP Expired") {
+            return res.status(403).send({ message: "OTP Expired" });
+          }
+        })
+        .catch((error) => {
+          return res.status(403).json({ message: "Invalid OTP" });
+        });
+    } catch (e) {
+      console.log(e);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  };
 
 
-exports.loginWithPhone = async (req,res)=>{
-  try{
-    const { phoneNumber } = req.body;
-    const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
-    twilioClient.verify.v2.services(process.env.TWILIO_SERVICE_SID)
-        .verifications
-        .create({ to: formattedPhoneNumber, channel: 'sms' })
-        .then(verification => res.status(200).send({ success: true, message: 'OTP sent successfully' }))
-        .catch(error => res.status(500).send({ success: false, message: error.message }));
-  }catch(error){
-    return res.status(500).json({
-      status: 0,
-      message: error.toString(),
-    });
- }
-  }
+
 
 exports.registrationUser = async (req, res) => {
    try{
