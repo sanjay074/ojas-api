@@ -9,7 +9,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 app.get("/", (req, res) => {
-  res.send("<h1>Bingo, Your Location is now  Compromised❗❗❗👌😒</h1>");
+  res.send("<h1>A Node Js API is listening on port❗❗❗👌😒</h1>");
 });
 
 mongoose

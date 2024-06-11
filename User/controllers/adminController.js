@@ -35,7 +35,7 @@ exports.registrationUser = async (req, res) => {
      
    }
 
-
+   
    exports.asminUserLogin = async (req, res) => {
     try {
       const {error}= adminUserLoginSchema.validate(req.body);
@@ -98,7 +98,7 @@ exports.registrationUser = async (req, res) => {
     } catch (err) {
         return res.status(500).json({
             status: 0,
-            message: error.toString(),
+            message: err.toString(),
           });
     }
   };

@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-
+const User = require("../User/models/user");
 const verifyToken = (req, res, next) => {
     let authHeader = req.header("authorization");
     if (authHeader) {
@@ -36,13 +36,14 @@ const verifyToken = (req, res, next) => {
 
   
   const verifyTokenAndUser = async (req, res, next) => {
-    const user = await UserDetaills.findById(req.user._id);
-    console.log(user);
-    if (!user) {
-      return res.status(401).json({status:0,message:"You are not  user."});
-    } else {
-      next();
-    }
+    verifyToken(req,res,async()=>{
+      const user = await User.findById(req.user.id);
+      if(!user){
+        return res.status(401).json({status:0,message:"You are not  unauthorized user"});
+      }else{
+        next();
+      }
+    })
   };
 
  module.exports={
