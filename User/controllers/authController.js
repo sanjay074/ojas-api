@@ -46,7 +46,7 @@ const {registrationUserSchema,userLoginSchema,phoneSchema,otpSchema} = require("
  * @param {*} req
  * @param {*} res
  * @returns data
- * @description  🙂🙂🙂User 🙂🙂🙂
+ * @description  🙂🙂🙂User verifyOTP 🙂🙂🙂
  * @date 11/06/2024
  * @author Sanjay Kumar
  **/
