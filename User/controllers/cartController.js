@@ -1,7 +1,8 @@
 const  mongoose  = require("mongoose");
 const Cart = require("../models/cart");
 exports.addToCart = async (req, res) => {
-    const { userId, couresId, quantity } = req.body;
+    const { couresId, quantity } = req.body;
+    const userId = req.user.id;
     try {
         let cart = await Cart.findOne({ userId });
         if (cart) {
@@ -36,7 +37,8 @@ exports.addToCart = async (req, res) => {
 
 
 exports.removeFromCart = async (req, res) => {
-    const { userId, productId } = req.body;
+    const {productId } = req.body;
+    const userId = req.user.id;
     try {
         let cart = await Cart.findOne({ userId });
         if (cart) {
@@ -55,7 +57,7 @@ exports.removeFromCart = async (req, res) => {
 };
 
 exports.getCart = async (req, res) => {
-    const  userId  = req.params.id;
+    const userId = req.user.id;
     if(!mongoose.Types.ObjectId.isValid(userId)){
         return res.status(400).json({ status: 0, message: "Invalid user ID" });
     }
