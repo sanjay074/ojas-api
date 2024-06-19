@@ -7,7 +7,7 @@ exports.addClass = async (req,res)=>{
     if(error){
         return res.status(400).json(error.details[0].message);
     }
-    const {couresId,classNo,description,classyoutubelink,videoWatchTime} = req.body
+    const {couresId,classNo,description,classyoutubelink,videoWatchTime,className} = req.body
     const exist = await Class.findOne({classNo});
     if(exist){
         return res.status(400).json({
@@ -16,7 +16,7 @@ exports.addClass = async (req,res)=>{
         })
     }
     const addClass = new Class ({
-       couresId,classNo,description,classyoutubelink,videoWatchTime
+       couresId,classNo,description,classyoutubelink,videoWatchTime,className
 
     })
     const saveData = await addClass.save();

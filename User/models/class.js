@@ -5,6 +5,10 @@ const classSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Coures",
       },
+      className: {
+        type: String,
+        required: true,
+      },  
     classNo: {
       type: Number,
       required: true,
