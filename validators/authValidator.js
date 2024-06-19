@@ -50,13 +50,16 @@ const addCouresSchema =Joi.object({
   totalPrice:Joi.number().required(),
   title: Joi.string().required(),
   description: Joi.string().required(),
-  type: Joi.string().valid("free", "paid").default("free"),
+  type: Joi.string().valid("free", "paid").default("free").messages({
+    'any.only': 'type must be one of [free, paid]'
+  })
 })
 
 
 const addClassSchema =Joi.object({
   couresId: Joi.string().required(),
   classNo:Joi.number().required(),
+  className:Joi.string().required(),
   description:Joi.number().required(),
   classyoutubelink: Joi.string().required(),
   description: Joi.string().required(),
