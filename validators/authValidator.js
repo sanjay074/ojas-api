@@ -5,7 +5,7 @@ const passwordSchema = Joi.string()
 .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,30}$'))
 .required()
 .messages({
-  'string.pattern.base': 'Password must be between 8-30 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.',
+  'string.pattern.base': 'Password must be between 8-30 characters long, include at least one    uppercase letter, one lowercase letter, one number, and one special character.',
   'string.min': 'Password must be at least 8 characters long.',
   'string.max': 'Password must not exceed 30 characters.',
   'any.required': 'Password is required.'
@@ -73,6 +73,13 @@ const ratingSchema =Joi.object({
   rating: Joi.number().integer().min(1).max(5).required(),
   review: Joi.string().optional()
 })
+const fabricStore=Joi.object({
+   name:Joi.string().required(),
+   title:Joi.string().required(),
+   price:Joi.number().required(),
+   discount:Joi.number().required(),
+   
+})
 
 const upadteRatingSchema =Joi.object({
   rating: Joi.number().integer().min(1).max(5).required(),
@@ -108,5 +115,6 @@ ratingSchema,
 upadteRatingSchema,
 phoneSchema,
 otpSchema,
-userUpdateProfileSchema
+userUpdateProfileSchema,
+fabricStore
 }

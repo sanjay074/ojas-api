@@ -28,6 +28,7 @@ const Coures = require("./User/routes/coures");
 const Class = require("./User/routes/class");
 const Rating = require("./User/routes/rating");
 const Cart = require("./User/routes/cart");
+const fabric=require("./User/routes/fabric")
 
 // middleware
 app.use(helmet());
@@ -41,6 +42,10 @@ app.use("/api",Coures);
 app.use("/api",Class);
 app.use("/api",Rating);
 app.use("/api",Cart);
+app.use('/api',fabric)
+app.use('/api',fabric)
+app.use('/api',fabric)
+app.use('/api',fabric)
 
 
 
