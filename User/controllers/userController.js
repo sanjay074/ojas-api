@@ -3,6 +3,7 @@ const Coures = require("../models/coures");
 const Class = require("../models/class");
 const {userUpdateProfileSchema} = require("../../validators/authValidator");
 const cloudinary = require("../../utils/cloudinary");
+const { default: mongoose } = require("mongoose");
 exports.userUpdateProfile =async (req,res)=>{
     try {
         const { name, dob, email } =
@@ -42,6 +43,22 @@ exports.userUpdateProfile =async (req,res)=>{
       }
 
 }
+exports.getUserData=async (req,res)=>{
+  try{
+    const getallData= await User.find({},{password:0})
+    // console.log(getallData);
+    if(getallData.length===0){
+      return res.status(200).json({message:" empty user "})
+    }
+    return res.status(200).json({
+      message:"Get all users lists",getallData
+    }) 
+        
+  }catch(err){
+    res.json({message:"data fetch error ",err})
+
+  }
+}
 
 
 exports.profileImageUpload = async (req, res) => {
@@ -76,6 +93,26 @@ exports.profileImageUpload = async (req, res) => {
       message: error.message.toString(),
     });
   }
+};
+
+exports.DeleteUser= async(req ,res)=>{
+  try{
+    const userId=req.params.id;
+     if(!mongoose.Types.ObjectId.isValid(userId)){
+      return res.status(400).json({message:"invalid user id "})
+     }
+     const userdeleteId=await User.findByIdAndDelete(req.params.id)
+    //  console.log(userdeleteId);
+     if(!userdeleteId)
+      {
+        return res.status(400).json({message:"user id not found "})
+      }
+     res.status(200).json({message:"user id deleted sucessesfull"})
+
+  }catch(error){
+        res.status(500).json({message:"user id not delete",error})
+  }
+   
 }; 
 
 
