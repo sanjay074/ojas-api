@@ -5,7 +5,7 @@ const {userUpdateProfileSchema} = require("../../validators/authValidator");
 const cloudinary = require("../../utils/cloudinary");
 exports.userUpdateProfile =async (req,res)=>{
     try {
-        const { name, userName, email } =
+        const { name, dob, email } =
           req.body;
         const { error } = userUpdateProfileSchema.validate(req.body);
         if (error) {
@@ -17,7 +17,7 @@ exports.userUpdateProfile =async (req,res)=>{
             req.body,
             ({
              name,
-             userName,email
+             dob,email
             },
             { upsert: true },
             { new: true })
@@ -76,4 +76,17 @@ exports.profileImageUpload = async (req, res) => {
       message: error.message.toString(),
     });
   }
-};
+}; 
+
+
+exports.userProfileDetails = async (req,res)=>{
+   try{
+    const userDetails = await User.findById(req.user.id,{__v:0,_id:0});
+    return res.status(200).json({status:true,message:"Get user details successfully",userDetails})
+   }catch(error){
+    return res.status(500).json({
+      status:0,
+      message:error.message.toString(),
+    })
+   }
+}

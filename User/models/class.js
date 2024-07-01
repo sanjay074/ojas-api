@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
-
+const Coures =require("../models/coures");
 const classSchema = new mongoose.Schema(
   {
-    couresId: {  // Change courseId to couresId
+    courseId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Course",
+      ref: 'Coures',
       required: true,
-    },
+  },
     className: {
       type: String,
       required: true,

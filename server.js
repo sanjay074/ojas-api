@@ -9,7 +9,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 app.get("/", (req, res) => {
-  res.send("<h1>A Node Js API is listening on port❗❗❗👌😒</h1>");
+  res.send(`<h1>A Node Js API is listening on port ${process.env.PORT}❗❗❗👌😒</h1>`);
 });
 
 mongoose
@@ -29,7 +29,7 @@ const Class = require("./User/routes/class");
 const Rating = require("./User/routes/rating");
 const Cart = require("./User/routes/cart");
 const fabric=require("./User/routes/fabric")
-
+const Banner = require("./User/routes/banner");
 // middleware
 app.use(helmet());
 app.use(morgan("dev"));
@@ -42,8 +42,8 @@ app.use("/api",Coures);
 app.use("/api",Class);
 app.use("/api",Rating);
 app.use("/api",Cart);
-app.use('/api',fabric)
-
+app.use('/api',fabric);
+app.use("/api",Banner);
 
 
 

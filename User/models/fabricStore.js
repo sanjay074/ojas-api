@@ -9,6 +9,9 @@ const fabricStore= mongoose.Schema({
         type:String,
         required:true,
     },
+    totalPrice:{
+      type:Number
+    },
     price:{
         type:Number,
         required:true,
@@ -18,6 +21,9 @@ const fabricStore= mongoose.Schema({
         type:Number,
         required:true,
     },
+    imageUrl:{
+        type:String
+    }
    
 },{timestamps: true})
 
