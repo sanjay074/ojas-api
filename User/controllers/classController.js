@@ -93,3 +93,25 @@ exports.updateClass = async (req,res)=>{
     }
 
 }
+
+
+exports.getAllClassByCourseId = async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      if (!mongoose.Types.ObjectId.isValid(courseId)) {
+        return res.status(400).json({ success: false, message: 'Invalid course ID format' });
+      }
+  
+      const classList = await Class.find({couresId: new mongoose.Types.ObjectId(courseId) });
+      if (classList.length === 0) {
+        console.log('No classes found for this course ID');
+        return res.status(404).json({ success: false, message: 'No classes available for this course ID' });
+      }
+      return res.status(200).json({ success: true, message: "Retrieved all classes successfully", classList });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };

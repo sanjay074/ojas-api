@@ -44,10 +44,9 @@ app.use("/api",Class);
 app.use("/api",Rating);
 app.use("/api",Cart);
 app.use('/api',fabric)
-app.use('/api',fabric)
-app.use('/api',fabric)
-app.use('/api',fabric)
+
 app.use('/api',User)
+
 
 
 
