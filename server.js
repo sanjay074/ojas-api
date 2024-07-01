@@ -29,6 +29,7 @@ const Class = require("./User/routes/class");
 const Rating = require("./User/routes/rating");
 const Cart = require("./User/routes/cart");
 const fabric=require("./User/routes/fabric")
+const User =require('./User/routes/user')
 
 // middleware
 app.use(helmet());
@@ -46,6 +47,7 @@ app.use('/api',fabric)
 app.use('/api',fabric)
 app.use('/api',fabric)
 app.use('/api',fabric)
+app.use('/api',User)
 
 
 
