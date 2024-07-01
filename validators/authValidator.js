@@ -20,7 +20,7 @@ const registrationUserSchema = Joi.object({
 
 const userUpdateProfileSchema = Joi.object({
   name: Joi.string().required(),
-  userName:Joi.string().required(),
+  dob:Joi.string().required(),
   email: Joi.string().required(),
 })
 
@@ -57,7 +57,7 @@ const addCouresSchema =Joi.object({
 
 
 const addClassSchema =Joi.object({
-  couresId: Joi.string().required(),
+  courseId: Joi.string().required(),
   classNo:Joi.number().required(),
   className:Joi.string().required(),
   description:Joi.number().required(),
@@ -76,7 +76,7 @@ const ratingSchema =Joi.object({
 const fabricStore=Joi.object({
    name:Joi.string().required(),
    title:Joi.string().required(),
-   price:Joi.number().required(),
+   totalPrice:Joi.number().required(),
    discount:Joi.number().required(),
    
 })
@@ -104,6 +104,12 @@ const phoneSchema = Joi.object()
   })
   .required();
 
+  const bannerSchema=Joi.object({
+    name:Joi.string().required(),
+    description:Joi.string().required(),
+    image:Joi.string(),
+ })  
+
 module.exports={
 registrationUserSchema,
 userLoginSchema,
@@ -116,5 +122,6 @@ upadteRatingSchema,
 phoneSchema,
 otpSchema,
 userUpdateProfileSchema,
-fabricStore
+fabricStore,
+bannerSchema
 }

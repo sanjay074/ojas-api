@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
     },
-    userName: {
+    dob: {
       type: String
     },
     profileImage: {

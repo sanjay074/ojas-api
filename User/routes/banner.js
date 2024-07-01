@@ -1,0 +1,10 @@
+const express = require("express");
+const router = express.Router();
+const  {upload} = require("../../middlewares/fileUpload");
+const {verifyTokenAndAdmin} = require("../../middlewares/auth");
+const {uploadBannerImage,getAllBannerImage,deleteBannerImage,updateBannerImage}= require("../controllers/banner");
+router.post("/banner",verifyTokenAndAdmin,upload,uploadBannerImage);
+router.get("/getBanner",verifyTokenAndAdmin,getAllBannerImage);
+router.delete("/deleteBanner/:id",verifyTokenAndAdmin,deleteBannerImage);
+router.put("/updateBannerImage/:id",verifyTokenAndAdmin,upload,updateBannerImage);
+module.exports = router;

@@ -1,29 +1,59 @@
 const { default: mongoose } = require("mongoose");
 const fabricModal = require("../models/fabricStore");
 const { fabricStore } = require("../../validators/authValidator");
+const cloudinary = require("../../utils/cloudinary");
 
 const postFabricItem = async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
+
     const { error } = fabricStore.validate(req.body);
     if (error) {
-     return res
+      return res
         .status(400)
         .json({ status: false, message: error.details[0].message });
     }
 
-    const fabricInstance = new fabricModal(data);
-    const saveData = await fabricInstance.save();
-    // console.log(saveData, "save data");
-    // console.error(saveData)
-    res
-      .status(200)
-      .json({ success: true, massage: " fabric data add successfully " });
+    if (!req.file) {
+      return res.status(400).json({
+        status: false,
+        message: "Missing required parameter - file"
+      });
+    }
+
+    const streamUpload = (req) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream((error, result) => {
+          if (result) {
+            resolve(result);
+          } else {
+            reject(error);
+          }
+        });
+        stream.end(req.file.buffer);
+      });
+    };
+
+    const result = await streamUpload(req);
+
+    const { name, title, discount,totalPrice } = req.body;
+    const discountedPrice = totalPrice - (totalPrice * (discount / 100));
+    const addFabric = new fabricModal({
+      name,
+      title,
+      totalPrice,
+      price: discountedPrice,
+      discount,
+      imageUrl: result.secure_url
+    });
+
+    const saveData = await addFabric.save();
+    return res.status(201).json({ success: true, message: "Fabric data added successfully" });
   } catch (error) {
-    res.status(500).json({ message: "fabric data not send ", error });
+    res.status(500).json({ message: "Fabric data not sent", error });
   }
 };
+
 
 const getFabricItem = async (req, res) => {
   try {
