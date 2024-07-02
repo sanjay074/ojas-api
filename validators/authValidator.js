@@ -5,7 +5,7 @@ const passwordSchema = Joi.string()
 .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,30}$'))
 .required()
 .messages({
-  'string.pattern.base': 'Password must be between 8-30 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.',
+  'string.pattern.base': 'Password must be between 8-30 characters long, include at least one    uppercase letter, one lowercase letter, one number, and one special character.',
   'string.min': 'Password must be at least 8 characters long.',
   'string.max': 'Password must not exceed 30 characters.',
   'any.required': 'Password is required.'
@@ -20,7 +20,7 @@ const registrationUserSchema = Joi.object({
 
 const userUpdateProfileSchema = Joi.object({
   name: Joi.string().required(),
-  userName:Joi.string().required(),
+  dob:Joi.string().required(),
   email: Joi.string().required(),
 })
 
@@ -57,7 +57,7 @@ const addCouresSchema =Joi.object({
 
 
 const addClassSchema =Joi.object({
-  couresId: Joi.string().required(),
+  courseId: Joi.string().required(),
   classNo:Joi.number().required(),
   className:Joi.string().required(),
   description:Joi.number().required(),
@@ -72,6 +72,13 @@ const ratingSchema =Joi.object({
   userId: Joi.string().required(),
   rating: Joi.number().integer().min(1).max(5).required(),
   review: Joi.string().optional()
+})
+const fabricStore=Joi.object({
+   name:Joi.string().required(),
+   title:Joi.string().required(),
+   totalPrice:Joi.number().required(),
+   discount:Joi.number().required(),
+   
 })
 
 const upadteRatingSchema =Joi.object({
@@ -97,6 +104,12 @@ const phoneSchema = Joi.object()
   })
   .required();
 
+  const bannerSchema=Joi.object({
+    name:Joi.string().required(),
+    description:Joi.string().required(),
+    image:Joi.string(),
+ })  
+
 module.exports={
 registrationUserSchema,
 userLoginSchema,
@@ -108,5 +121,7 @@ ratingSchema,
 upadteRatingSchema,
 phoneSchema,
 otpSchema,
-userUpdateProfileSchema
+userUpdateProfileSchema,
+fabricStore,
+bannerSchema
 }

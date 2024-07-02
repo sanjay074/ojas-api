@@ -7,7 +7,7 @@ exports.addClass = async (req,res)=>{
     if(error){
         return res.status(400).json(error.details[0].message);
     }
-    const {couresId,classNo,description,classyoutubelink,videoWatchTime,className} = req.body
+    const {courseId,classNo,description,classyoutubelink,videoWatchTime,className} = req.body
     const exist = await Class.findOne({classNo});
     if(exist){
         return res.status(400).json({
@@ -16,7 +16,7 @@ exports.addClass = async (req,res)=>{
         })
     }
     const addClass = new Class ({
-       couresId,classNo,description,classyoutubelink,videoWatchTime,className
+      courseId,classNo,description,classyoutubelink,videoWatchTime,className
 
     })
     const saveData = await addClass.save();
@@ -32,7 +32,7 @@ exports.addClass = async (req,res)=>{
 
 exports.getAllClass = async(req,res)=>{
     try{
-        const getAllClass = await Class.find().populate("couresId")
+        const getAllClass = await Class.find().populate("courseId")
         if(!getAllClass){
             return res.status(400).json({
                 success:false,
@@ -76,7 +76,7 @@ exports.updateClass = async (req,res)=>{
         if(!mongoose.Types.ObjectId.isValid(classId)){
             return res.status(400).json({ success:false, message: "Invalid course ID" });
           }
-        const getAllClass = await Class.findById(classId).populate("couresId")
+        const getAllClass = await Class.findById(classId).populate("courseId")
         if(!getAllClass){
             return res.status(400).json({
                 success:false,
@@ -93,3 +93,25 @@ exports.updateClass = async (req,res)=>{
     }
 
 }
+
+
+exports.getAllClassByCourseId = async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      if (!mongoose.Types.ObjectId.isValid(courseId)) {
+        return res.status(400).json({ success: false, message: 'Invalid course ID format' });
+      }
+  
+      const classList = await Class.find({courseId: new mongoose.Types.ObjectId(courseId) });
+      if (classList.length === 0) {
+        console.log('No classes found for this course ID');
+        return res.status(404).json({ success: false, message: 'No classes available for this course ID' });
+      }
+      return res.status(200).json({ success: true, message: "Retrieved all classes successfully", classList });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };

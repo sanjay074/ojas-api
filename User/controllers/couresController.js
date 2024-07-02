@@ -1,13 +1,29 @@
 const Coures = require("../models/coures");
 const mongoose = require("mongoose")
 const {addCouresSchema} = require("../../validators/authValidator");
-
+const cloudinary = require("../../utils/cloudinary");
 exports.addCoures = async (req,res)=>{
     try{
      const {error} = addCouresSchema.validate(req.body);
      if(error){
         return res.status(400).json({success:false,message:error.details[0].message});
      }
+     if (!req.file) {
+      return res.status(400).json({
+        status: 0,
+        message: "Missing required parameter - file"
+      });
+    }
+
+    const result = await cloudinary.uploader.upload_stream({
+      resource_type: 'image'
+    }, async (error, result) => {
+      if (error) {
+        return res.status(500).json({
+          status: 0,
+          message: error.message.toString(),
+        });
+      }
      const {couresName,sellPrice,totalPrice,title,description,type} = req.body;
      const exist = await Coures.findOne({couresName});
      if(exist){
@@ -22,11 +38,13 @@ exports.addCoures = async (req,res)=>{
         title,
         totalPrice,
         description,
-        type
+        type,
+        imageUrl:result.secure_url 
      })
 
      const saveData = await addCoures.save();
       return res.status(201).json({success:true, message:"New coures created  sucessfully"});
+    }).end(req.file.buffer);
     }catch(error){
         return res.status(500).json({
             status:0,
@@ -72,7 +90,7 @@ exports.getAllCoures = async (req, res) => {
 
   exports.getAllFreeCoures = async (req,res)=>{
     try{
-      const freeCourses = (await Coures.find({type:"free"},{createdAt:0,updatedAt:0,_id:0,__v:0}));
+      const freeCourses = await Coures.find({type:"free"},{updatedAt:0,_id:0,__v:0}).sort({createdAt: -1});
       if(freeCourses.length===0){
         return res.status(400).json({success:false,message:"No free courses available"})
       }
@@ -88,7 +106,7 @@ exports.getAllCoures = async (req, res) => {
 
 exports.getAllpaidCoures = async (req,res)=>{
     try{
-      const paidCourses = (await Coures.find({type:"paid"},{createdAt:0,updatedAt:0,_id:0,__v:0}));
+      const paidCourses = await Coures.find({type:"paid"},{updatedAt:0,_id:0,__v:0}).sort({createdAt:-1});
       if(paidCourses.length===0){
         return res.status(400).json({success:false,message:"No paid courses available"})
       }
@@ -127,7 +145,19 @@ exports.updateCoures = async (req,res)=>{
   if(!mongoose.Types.ObjectId.isValid(courseId)){
     return res.status(400).json({ success:false, message: "Invalid course ID" });
   }
-  const updateCoures = await Coures.findByIdAndUpdate(courseId,{$set:req.body},{new:true});
+  const updateData = req.body;
+    
+        if (req.file) {
+          const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }).end(req.file.buffer);
+          });
+    
+          updateData.imageUrl = result.secure_url;
+        }
+  const updateCoures = await Coures.findByIdAndUpdate(courseId,updateData,{new:true});
   return res.status(200).json({
     success:true,
     message: "Coures data update successfully",

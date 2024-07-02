@@ -10,10 +10,10 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
     },
-    userName: {
+    dob: {
       type: String
     },
-    imageUrl: {
+    profileImage: {
       type: String,
     },
     password:{

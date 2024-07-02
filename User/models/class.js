@@ -1,14 +1,16 @@
 const mongoose = require("mongoose");
+const Coures =require("../models/coures");
 const classSchema = new mongoose.Schema(
   {
-    couresId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Coures",
-      },
-      className: {
-        type: String,
-        required: true,
-      },  
+    courseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Coures',
+      required: true,
+  },
+    className: {
+      type: String,
+      required: true,
+    },
     classNo: {
       type: Number,
       required: true,
@@ -20,10 +22,10 @@ const classSchema = new mongoose.Schema(
     classyoutubelink: {
       type: String,
     },
-    videoWatchTime:{
-        type:String
+    videoWatchTime: {
+      type: String,
     }
-},
+  },
   { timestamps: true }
 );
 
