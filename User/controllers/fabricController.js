@@ -6,7 +6,7 @@ const cloudinary = require("../../utils/cloudinary");
 const postFabricItem = async (req, res) => {
   try {
     const data = req.body;
-
+    
     const { error } = fabricStore.validate(req.body);
     if (error) {
       return res
@@ -129,33 +129,61 @@ const deleteFabricItem = async (req, res) => {
 };
   
 
+
+
 const updateFabricItem = async (req, res) => {
   try {
-    const fabricId = req.params.id;
-    // const dbId= await fabricModal.findById({id})
-   
-    if (!mongoose.Types.ObjectId.isValid(fabricId)) {
-      return res
-        .status(400)
-        .json({ status: false, message: "invalid fabric id" });
-    }
-    
-    const updateById = await fabricModal.findByIdAndUpdate(fabricId);
-    if(!updateById)
-      {
-       return  res.status(400).json({status:false,message:"fabric id not found"})
+    const  fabricId  = req.params.id;
+      if (!req.file) {
+          return res.status(400).json({
+              status: 0,
+              message: "Missing required parameter - file"
+          });
       }
-    
-    // console.log(updateById);
-    res
-      .status(200)
-      .json({ status: true, message: "update fabric item ", updateById });
+      const fabric = await fabricModal.findById(fabricId);
+      if (!fabric) {
+          return res.status(404).json({
+              status: 0,
+              message: "Banner not found"
+          });
+      }
+
+      const oldImageUrl = fabric.imageUrl;
+      const oldPublicId = oldImageUrl.split('/').pop().split('.')[0];
+      cloudinary.uploader.destroy(oldPublicId, async (error, result) => {
+          if (error) {
+              return res.status(500).json({
+                  status: 0,
+                  message: error.message.toString(),
+              });
+          }
+          cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
+              if (error) {
+                  return res.status(500).json({
+                      status: 0,
+                      message: error.message.toString(),
+                  });
+              }
+              const {discount,totalPrice } = req.body;
+              const discountedPrice = totalPrice - (totalPrice * (discount / 100));
+              fabric.imageUrl = result.secure_url;
+              fabric.price=discountedPrice;
+              fabric.name = req.body.name || fabric.name;
+              fabric.title = req.body.title || fabric.title;
+              fabric.totalPrice=req.body.totalPrice || fabric.totalPrice;
+              fabric.discount=req.body.discount || fabric.discount;
+              await fabric.save();
+              return res.status(200).json({
+                  success: true,
+                  message: "Fabric image updated successfully",
+              });
+          }).end(req.file.buffer);
+      });
   } catch (error) {
-    res.status(500).json({
-      status: false,
-      message: "fabric item not update ",
-      error,
-    });
+      return res.status(500).json({
+          status: 0,
+          message: error.message.toString(),
+      });
   }
 };
 module.exports = {
