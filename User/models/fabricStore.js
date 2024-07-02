@@ -28,5 +28,5 @@ const fabricStore= mongoose.Schema({
 },{timestamps: true})
 
 
-const fabricModal=mongoose.model("fabric",fabricStore)
+const fabricModal=mongoose.model("Fabric",fabricStore)
 module.exports=fabricModal

@@ -6,7 +6,7 @@ const cloudinary = require("../../utils/cloudinary");
 const postFabricItem = async (req, res) => {
   try {
     const data = req.body;
-    
+
     const { error } = fabricStore.validate(req.body);
     if (error) {
       return res
@@ -144,7 +144,7 @@ const updateFabricItem = async (req, res) => {
       if (!fabric) {
           return res.status(404).json({
               status: 0,
-              message: "Banner not found"
+              message: "Fabric not found"
           });
       }
 
