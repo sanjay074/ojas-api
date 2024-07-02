@@ -2,8 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const User = require("../models/user");
-const {registrationUserSchema,userLoginSchema,phoneSchema,otpSchema} = require("../../validators/authValidator");
-  
+const { registrationUserSchema, userLoginSchema, phoneSchema, otpSchema } = require("../../validators/authValidator");
+
 /**
  * @param {*} req
  * @param {*} res
@@ -12,35 +12,34 @@ const {registrationUserSchema,userLoginSchema,phoneSchema,otpSchema} = require("
  * @date 11/06/2024
  * @author Sanjay Kumar
  **/
-  exports.phoneLogin = (req, res) => {
-    const { error } = phoneSchema.validate(req.body);
-    if (error) {
-      res.status(400).send(error.details[0].message);
-      return;
-    }
-    if (req.body.phone === "9999999999") {
-      return res.status(200).send({
-        success: true,
-        message: "Dummy Account Login",
-        otp: "Enter any 6 digit otp",
+exports.phoneLogin = (req, res) => {
+  const { error } = phoneSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+  if (req.body.phone === "9999999999") {
+    return res.status(200).send({
+      success: true,
+      message: "Dummy Account Login",
+      otp: "Enter any 6 digit otp",
+    });
+  }
+  axios
+    .get(
+      "https://2factor.in/API/V1/ad542ca6-24b4-11ef-8b60-0200cd936042/SMS/" +
+      req.body.phone +
+      "/AUTOGEN/User verification"
+    )
+    .then(function (response) {
+      return res.status(200).json({
+        success: "otp sent successfully",
+        details: response.data.Details,
       });
-    }
-    axios
-      .get(
-        "https://2factor.in/API/V1/ad542ca6-24b4-11ef-8b60-0200cd936042/SMS/" +
-          req.body.phone +
-          "/AUTOGEN/User verification"
-      )
-      .then(function (response) {
-        return res.status(200).json({
-          success: "otp sent successfully",
-          details: response.data.Details,
-        });
-      })
-      .catch((er) => {
-        return res.status(500).json({ message: "Error", error: er.name });
-      });
-  };
+    })
+    .catch((er) => {
+      return res.status(500).json({ message: "Error", error: er.name });
+    });
+};
 
 /**
  * @param {*} req
@@ -55,15 +54,15 @@ exports.verifyOTP = (req, res) => {
   try {
     const { error } = otpSchema.validate(req.body);
     if (error) {
-      res.status(400).send(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
       return;
     }
     axios
       .get(
         "https://2factor.in/API/V1/ad542ca6-24b4-11ef-8b60-0200cd936042/SMS/VERIFY/" +
-          req.body.details +
-          "/" +
-          req.body.otp
+        req.body.details +
+        "/" +
+        req.body.otp
       )
       .then(async (response) => {
         if (response.data.Details === "OTP Matched") {
@@ -119,66 +118,66 @@ exports.verifyOTP = (req, res) => {
 
 
 exports.registrationUser = async (req, res) => {
-   try{
-    const {name,email,password,userName} = req.body;
+  try {
+    const { name, email, password, userName } = req.body;
     const { error } = registrationUserSchema.validate(req.body);
-    if(error){
-        res.status(400).send(error.details[0].message);
-        return;
+    if (error) {
+      res.status(400).send(error.details[0].message);
+      return;
     }
     const exist = await User.exists({ email: req.body.email });
     if (exist) {
-      return res.status(400).json({status:0, message:"This email is already taken!"});
+      return res.status(400).json({ status: 0, message: "This email is already taken!" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
-        name,
-        userName,
-        email,
-        password:hashedPassword
+      name,
+      userName,
+      email,
+      password: hashedPassword
     })
     const saveUserData = await newUser.save();
-    res.status(200).json({status:1, message:"User registration is sucessfully"});
+    res.status(200).json({ status: 1, message: "User registration is sucessfully" });
 
-   }catch(error){
+  } catch (error) {
 
     return res.status(500).json({
-        status: 0,
-        message: error.toString(),
-      });
-   }
-    
+      status: 0,
+      message: error.toString(),
+    });
   }
 
-  exports.userLogin = async (req, res) => {
-    try {
-      const {error}= userLoginSchema.validate(req.body);
-      if(error){
-        return res.status(400).json(error.details[0].message)
-      }
-     const user = await User.findOne({
-        $or: [{ email: req.body.email}, { userName: req.body.userName }],
-      });
-      if (!user) {
-        return res.status(400).json({status:0, message: 'Invalid credentials'});
-      }
-      const match = await bcrypt.compare(req.body.password, user.password);
-      if (!match) {
-        return res.status(400).json({status:0, message: 'Invalid credentials'});
-      } else {
-        const token = jwt.sign(
-          {
-            id: user._id
-          },
-          process.env.JWT_SER,
-          { expiresIn: "30d" }
-        );
-        res.status(200).json({status:1, message: "User is login sucessfully", token });
-      }
-    } catch (error) {
-        return res.status(500).json({
-            status: 0,
-            message: error.toString(),
-          });
+}
+
+exports.userLogin = async (req, res) => {
+  try {
+    const { error } = userLoginSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json(error.details[0].message)
     }
-  };
+    const user = await User.findOne({
+      $or: [{ email: req.body.email }, { userName: req.body.userName }],
+    });
+    if (!user) {
+      return res.status(400).json({ status: 0, message: 'Invalid credentials' });
+    }
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if (!match) {
+      return res.status(400).json({ status: 0, message: 'Invalid credentials' });
+    } else {
+      const token = jwt.sign(
+        {
+          id: user._id
+        },
+        process.env.JWT_SER,
+        { expiresIn: "30d" }
+      );
+      res.status(200).json({ status: 1, message: "User is login sucessfully", token });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString(),
+    });
+  }
+};

@@ -1,80 +1,81 @@
 const Banner = require("../models/banner");
 const cloudinary = require("../../utils/cloudinary");
-const {bannerSchema} = require("../../validators/authValidator");
+const { bannerSchema } = require("../../validators/authValidator");
 exports.uploadBannerImage = async (req, res) => {
     try {
-      const {error} = bannerSchema.validate(req.body);
-      if(error){
-        return res.status(400).json(error.details[0].message);
-     }
-      if (!req.file) {
-        return res.status(400).json({
-          status: 0,
-          message: "Missing required parameter - file"
-        });
-      }     
-      const result = await cloudinary.uploader.upload_stream({
-        resource_type: 'image'
-      }, async (error, result) => {
+        const { error } = bannerSchema.validate(req.body);
         if (error) {
-          return res.status(500).json({
+            return res.status(400).json(error.details[0].message);
+        }
+        if (!req.file) {
+            return res.status(400).json({
+                status: 0,
+                message: "Missing required parameter - file"
+            });
+        }
+        const result = await cloudinary.uploader.upload_stream({
+            resource_type: 'image'
+        }, async (error, result) => {
+            if (error) {
+                return res.status(500).json({
+                    status: 0,
+                    message: error.message.toString(),
+                });
+            }
+
+            const banner = new Banner({
+                imageUrl: result.secure_url,
+                name: req.body.name, description: req.body.name
+            });
+            await banner.save();
+            return res.status(201).json({
+                success: true,
+                message: "Banner image uploaded successfully"
+            });
+        }).end(req.file.buffer);
+
+    } catch (error) {
+        return res.status(500).json({
             status: 0,
             message: error.message.toString(),
-          });
-        }
-  
-        const banner = new Banner({imageUrl: result.secure_url ,
-            name:req.body.name,description:req.body.name
         });
-        await banner.save();
-        return res.status(201).json({
-          success: true,
-          message: "Banner image uploaded successfully"
-        });
-      }).end(req.file.buffer);
-  
-    } catch (error) {
-      return res.status(500).json({
-        status: 0,
-        message: error.message.toString(),
-      });
     }
-  };
+};
 
-exports.getAllBannerImage = async (req,res)=>{
-    try{
-      const banner = await Banner.find()
-      return res.status(200).json({
-        status:1,
-        message:"Get all banner image successfully",banner
-      })
-    }catch(error){
+exports.getAllBannerImage = async (req, res) => {
+    try {
+        const banner = await Banner.find()
+        return res.status(200).json({
+            status: 1,
+            message: "Get all banner image successfully", banner
+        })
+    } catch (error) {
         return res.status(500).json({
-            status:0,
-            message:error.message.toString(),
+            status: 0,
+            message: error.message.toString(),
         })
     }
 }
 
 //token free api 
-exports.getAllBanner = async (req,res)=>{
-    try{
-      const banner = await Banner.find()
-      return res.status(200).json({
-        status:1,
-        message:"Get all banner image successfully",banner
-      })
-    }catch(error){
+exports.getAllBanner = async (req, res) => {
+    try {
+        const banner = await Banner.find()
+        return res.status(200).json({
+            status: 1,
+            message: "Get all banner image successfully", banner
+        })
+    } catch (error) {
         return res.status(500).json({
-            status:0,
-            message:error.message.toString(),
+            status: 0,
+            message: error.message.toString(),
         })
     }
 }
 
 exports.deleteBannerImage = async (req, res) => {
     try {
-        const  bannerId  = req.params.id;
+        const bannerId = req.params.id;
         const banner = await Banner.findById(bannerId);
         if (!banner) {
             return res.status(404).json({
@@ -113,7 +114,7 @@ exports.deleteBannerImage = async (req, res) => {
 
 exports.updateBannerImage = async (req, res) => {
     try {
-        const bannerId  = req.params.id;
+        const bannerId = req.params.id;
         if (!req.file) {
             return res.status(400).json({
                 status: 0,

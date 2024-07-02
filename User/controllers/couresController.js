@@ -146,7 +146,7 @@ exports.updateCoures = async (req,res)=>{
     return res.status(400).json({ success:false, message: "Invalid course ID" });
   }
   const updateData = req.body;
-    
+  
         if (req.file) {
           const result = await new Promise((resolve, reject) => {
             cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
