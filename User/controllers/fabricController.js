@@ -57,38 +57,77 @@ const postFabricItem = async (req, res) => {
 
 const getFabricItem = async (req, res) => {
   try {
-    const allData = await fabricModal.find({});
-    if (allData.length===0) {
-        return  res.status(400).json({ message: "user data is empty" });
+    const getFabricItem = await fabricModal.find().sort({createdAt: -1});
+    if (getFabricItem.length===0) {
+        return  res.status(400).json({ message: "Fabric  data is empty" });
        }
     res
       .status(200)
-      .json({ success: true, message: "get all fabric data", allData });
-   // console.log(allData);
-   
+      .json({ success: true, message: "Get all fabric data successfully", getFabricItem });
+
   } catch (error) {
-    res.status(400).json({ message: "fabricData not able to fetch", error });
+     return res.status(500).json({
+        status:0,
+        message:error.toString()
+     })
   }
 };
+
+//Token free api 
+const getFabricData = async (req, res) => {
+  try {
+    const getFabricItem = await fabricModal.find().sort({createdAt: -1});
+    if (getFabricItem.length===0) {
+        return  res.status(400).json({ message: "Fabric  data is empty" });
+       }
+    res
+      .status(200)
+      .json({ success: true, message: "Get all fabric data successfully", getFabricItem });
+
+  } catch (error) {
+     return res.status(500).json({
+        status:0,
+        message:error.toString()
+     })
+  }
+};
+
 const deleteFabricItem = async (req, res) => {
   try {
-    const fabricId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(fabricId)) {
-      return res.status(500).json({ status: 0, message: "invalid delete id" });
-    }
-    const getData = await fabricModal.findByIdAndDelete(fabricId);
-
-    //  console.log(getData);
-
-    res.status(200).json({
-      status: true,
-      message: "fabric item delete successfully",
-      
-    });
-  } catch (err) {
-    res.status(500).json({ message: "fabric item not deleted ", err });
+      const  fabricId  = req.params.id;
+      const fabric = await fabricModal.findById(fabricId);
+      if (!fabric) {
+          return res.status(404).json({
+              status: 0,
+              message: "Fabric  not found this Id"
+          });
+      }
+    
+      const imageUrl = fabric.imageUrl;
+      const publicId = imageUrl.split('/').pop().split('.')[0];
+   
+      cloudinary.uploader.destroy(publicId, async (error, result) => {
+          if (error) {
+              return res.status(500).json({
+                  status: 0,
+                  message: error.message.toString(),
+              });
+          }
+  
+          await fabricModal.findByIdAndDelete(fabricId);
+          return res.status(200).json({
+              status: 1,
+              message: "Fabric image and document deleted successfully"
+          });
+      });
+  } catch (error) {
+      return res.status(500).json({
+          status: 0,
+          message: error.message.toString(),
+      });
   }
 };
+  
 
 const updateFabricItem = async (req, res) => {
   try {
@@ -124,4 +163,5 @@ module.exports = {
   getFabricItem,
   deleteFabricItem,
   updateFabricItem,
+  getFabricData
 };

@@ -56,7 +56,21 @@ exports.getAllBannerImage = async (req,res)=>{
     }
 }
 
-
+//token free api 
+exports.getAllBanner = async (req,res)=>{
+    try{
+      const banner = await Banner.find()
+      return res.status(200).json({
+        status:1,
+        message:"Get all banner image successfully",banner
+      })
+    }catch(error){
+        return res.status(500).json({
+            status:0,
+            message:error.message.toString(),
+        })
+    }
+}
 
 exports.deleteBannerImage = async (req, res) => {
     try {

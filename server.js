@@ -43,9 +43,10 @@ app.use("/api/auth",AdminAuth);
 app.use("/api",Coures);
 app.use("/api",Class);
 app.use("/api",Cart);
-app.use('/api',fabric)
-
-app.use('/api',User)
+app.use("/api",Rating);
+app.use('/api',fabric);
+app.use("/api",Banner);
+app.use('/api',User);
 
 
 

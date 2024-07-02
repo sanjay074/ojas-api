@@ -46,7 +46,7 @@ exports.userUpdateProfile =async (req,res)=>{
 exports.getUserData=async (req,res)=>{
   try{
     const getallData= await User.find({},{password:0})
-    // console.log(getallData);
+    
     if(getallData.length===0){
       return res.status(200).json({message:" empty user "})
     }
