@@ -132,9 +132,6 @@ const bannerSchema = Joi.object({
 })
 
 const userAddressJoiSchema = Joi.object({
-  userId: Joi.string().required().messages({
-    'any.required': 'User ID is required.',
-  }),
   fullName: Joi.string().required().messages({
     'any.required': 'Full name is required.',
   }),
@@ -162,6 +159,36 @@ const userAddressJoiSchema = Joi.object({
     houseNo: Joi.number().optional(),
   }).required(),
 });
+
+const updateUserAddressJoiSchema = Joi.object({
+  fullName: Joi.string().required().messages({
+    'any.required': 'Full name is required.',
+  }),
+  email: Joi.string().email().required().messages({
+    'any.required': 'Email is required.',
+    'string.email': 'Email must be a valid email address.',
+  }),
+  mobileNumber: Joi.string().required().messages({
+    'any.required': 'Mobile number is required.',
+  }),
+  deliveryAddress: Joi.object({
+    state: Joi.string().required().messages({
+      'any.required': 'State is required.',
+    }),
+    distrct: Joi.string().required().messages({
+      'any.required': 'District is required.',
+    }),
+    city: Joi.string().required().messages({
+      'any.required': 'City is required.',
+    }),
+    pinCode: Joi.number().required().messages({
+      'any.required': 'Pin code is required.',
+      'number.base': 'Pin code must be a number.',
+    }),
+    houseNo: Joi.number().optional(),
+  }).required(),
+});
+
 module.exports = {
   registrationUserSchema,
   userLoginSchema,
@@ -176,5 +203,6 @@ module.exports = {
   userUpdateProfileSchema,
   fabricStore,
   bannerSchema,
-  userAddressJoiSchema
+  userAddressJoiSchema,
+  updateUserAddressJoiSchema
 }
