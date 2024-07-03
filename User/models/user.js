@@ -1,3 +1,4 @@
+const { boolean } = require("joi");
 const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema(
   {
@@ -16,6 +17,10 @@ const userSchema = new mongoose.Schema(
     profileImage: {
       type: String,
     },
+    agree: {
+      type: Boolean,
+      default: false
+    }
     // password:{
     //     type:String
     // }
