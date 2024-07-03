@@ -22,6 +22,7 @@ const userUpdateProfileSchema = Joi.object({
   name: Joi.string().required(),
   dob: Joi.string().required(),
   email: Joi.string().required(),
+  agree: Joi.boolean().required()
 })
 
 const userLoginSchema = Joi.object({
