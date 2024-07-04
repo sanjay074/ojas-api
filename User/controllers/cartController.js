@@ -94,9 +94,11 @@ exports.removeFromCart = async (req, res) => {
 
 exports.getCart = async (req, res) => {
     const userId = req.user.id;
+
     if (!userId) {
         return res.status(400).json({ success: false, message: 'User ID is required' });
     }
+
     try {
         const cart = await Cart.findOne({ userId }).populate('items.itemId');
 
@@ -105,14 +107,21 @@ exports.getCart = async (req, res) => {
         }
 
         if (cart.items.length === 0) {
-            return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] } });
+            return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, totalAmount: 0 });
         }
-        res.status(200).json({ success: true, message: "Get user cart items", cart });
+
+        // Calculate the total amount
+        const totalAmount = cart.items.reduce((total, item) => {
+            const itemPrice = item.itemId.sellPrice || item.itemId.price || 0;
+            return total + (itemPrice * item.quantity);
+        }, 0);
+
+        res.status(200).json({ success: true, message: "Get user cart items", cart, totalAmount });
     } catch (error) {
         return res.status(500).json({
-            status: 0,
-            message: err.message.toString(),
-        })
+            success: false,
+            message: error.message.toString(),
+        });
     }
 };
 
