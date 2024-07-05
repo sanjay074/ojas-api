@@ -32,6 +32,8 @@ const fabric = require("./User/routes/fabric");
 const User = require('./User/routes/user');
 const Order = require('./User/routes/order');
 const Banner = require("./User/routes/banner");
+const Coupon = require("./User/routes/coupon");
+
 // middleware
 app.use(helmet());
 app.use(morgan("dev"));
@@ -48,7 +50,7 @@ app.use('/api', fabric);
 app.use("/api", Banner);
 app.use('/api', User);
 app.use('/api', Order);
-
+app.use('/api', Coupon);
 
 
 

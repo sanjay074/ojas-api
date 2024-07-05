@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Cart = require("../models/cart");
 const Coures = require('../models/coures');
+const Coupon = require('../models/coupon');
 const Fabric = require('../models/fabricStore');
 exports.addToCart = async (req, res) => {
 
@@ -92,8 +93,11 @@ exports.removeFromCart = async (req, res) => {
     }
 };
 
+
+
 exports.getCart = async (req, res) => {
     const userId = req.user.id;
+    const { couponCode } = req.body;
 
     if (!userId) {
         return res.status(400).json({ success: false, message: 'User ID is required' });
@@ -107,16 +111,32 @@ exports.getCart = async (req, res) => {
         }
 
         if (cart.items.length === 0) {
-            return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, totalAmount: 0 });
+            return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, totalAmount: 0, discount: 0 });
         }
 
         // Calculate the total amount
-        const totalAmount = cart.items.reduce((total, item) => {
+        let totalAmount = cart.items.reduce((total, item) => {
             const itemPrice = item.itemId.sellPrice || item.itemId.price || 0;
             return total + (itemPrice * item.quantity);
         }, 0);
 
-        res.status(200).json({ success: true, message: "Get user cart items", cart, totalAmount });
+        // Apply coupon if provided
+        let discount = 0;
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
+            if (coupon) {
+                if (coupon.discountType === 'percentage') {
+                    discount = (totalAmount * coupon.discountValue) / 100;
+                } else if (coupon.discountType === 'amount') {
+                    discount = coupon.discountValue;
+                }
+                totalAmount -= discount;
+            } else {
+                return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
+            }
+        }
+
+        res.status(200).json({ success: true, message: "Get user cart items", cart, totalAmount, discount });
     } catch (error) {
         return res.status(500).json({
             success: false,
