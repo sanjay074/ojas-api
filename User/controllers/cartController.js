@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Cart = require("../models/cart");
 const Coures = require('../models/coures');
+const Coupon = require('../models/coupon');
 const Fabric = require('../models/fabricStore');
 exports.addToCart = async (req, res) => {
 
@@ -34,7 +35,7 @@ exports.addToCart = async (req, res) => {
         }
 
         if (!item) {
-            return res.status(404).send('Item not found');
+            return res.status(404).json({ status: false, message: 'Item not found' });
         }
 
         let cart = await Cart.findOne({ userId });
@@ -92,11 +93,16 @@ exports.removeFromCart = async (req, res) => {
     }
 };
 
+
+
 exports.getCart = async (req, res) => {
     const userId = req.user.id;
+    const { couponCode } = req.body;
+
     if (!userId) {
         return res.status(400).json({ success: false, message: 'User ID is required' });
     }
+
     try {
         const cart = await Cart.findOne({ userId }).populate('items.itemId');
 
@@ -105,14 +111,54 @@ exports.getCart = async (req, res) => {
         }
 
         if (cart.items.length === 0) {
-            return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] } });
+            return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, orderSummary: { subtotal: 0, discount: 0, deliveryFee: 0, totalAmount: 0 } });
         }
-        res.status(200).json({ success: true, message: "Get user cart items", cart });
+
+        // Calculate the subtotal
+        let subtotal = cart.items.reduce((total, item) => {
+            const itemPrice = item.itemId.sellPrice || item.itemId.price || 0;
+            return total + (itemPrice * item.quantity);
+        }, 0);
+
+        // Apply coupon if provided
+        let discount = 0;
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode });
+            if (coupon) {
+                if (coupon.discountType === 'percentage') {
+                    discount = (subtotal * coupon.discountValue) / 100;
+                } else if (coupon.discountType === 'amount') {
+                    discount = coupon.discountValue;
+                }
+                subtotal -= discount;
+            } else {
+                return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
+            }
+        }
+
+        //Define a fixed delivery fee (for example, 5)
+        const deliveryFee = 15;
+
+        //Calculate the total amount
+        const totalAmount = subtotal - deliveryFee;
+
+        res.status(200).json({
+            success: true,
+            message: "Get user cart items",
+            cart,
+            orderSummary: {
+                subtotal,
+                discount,
+                deliveryFee,
+                totalAmount
+            }
+        });
     } catch (error) {
         return res.status(500).json({
-            status: 0,
-            message: err.message.toString(),
-        })
+            success: false,
+            message: error.message.toString(),
+        });
     }
 };
+
 

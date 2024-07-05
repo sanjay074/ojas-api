@@ -83,6 +83,7 @@ exports.deleteBannerImage = async (req, res) => {
                 message: "Banner  not found this Id"
             });
         }
+
         // Extract the public_id from the image URL
         const imageUrl = banner.imageUrl;
         const publicId = imageUrl.split('/').pop().split('.')[0];

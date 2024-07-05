@@ -189,6 +189,25 @@ const updateUserAddressJoiSchema = Joi.object({
   }).required(),
 });
 
+const couponValidationSchema = Joi.object({
+  code: Joi.string().required().messages({
+    'string.empty': 'Coupon code is required',
+    'any.required': 'Coupon code is required'
+  }),
+  discountType: Joi.string().valid('percentage', 'amount').required().messages({
+    'any.only': 'Discount type must be either percentage or amount',
+    'any.required': 'Discount type is required'
+  }),
+  discountValue: Joi.number().required().messages({
+    'number.base': 'Discount value must be a number',
+    'any.required': 'Discount value is required'
+  }),
+  expirationDate: Joi.date().required().messages({
+    'date.base': 'Expiration date must be a valid date',
+    'any.required': 'Expiration date is required'
+  })
+});
+
 module.exports = {
   registrationUserSchema,
   userLoginSchema,
@@ -204,5 +223,6 @@ module.exports = {
   fabricStore,
   bannerSchema,
   userAddressJoiSchema,
-  updateUserAddressJoiSchema
+  updateUserAddressJoiSchema,
+  couponValidationSchema
 }
