@@ -35,7 +35,7 @@ exports.addToCart = async (req, res) => {
         }
 
         if (!item) {
-            return res.status(404).send('Item not found');
+            return res.status(404).json({ status: false, message: 'Item not found' });
         }
 
         let cart = await Cart.findOne({ userId });
@@ -111,11 +111,11 @@ exports.getCart = async (req, res) => {
         }
 
         if (cart.items.length === 0) {
-            return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, totalAmount: 0, discount: 0 });
+            return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, orderSummary: { subtotal: 0, discount: 0, deliveryFee: 0, totalAmount: 0 } });
         }
 
-        // Calculate the total amount
-        let totalAmount = cart.items.reduce((total, item) => {
+        // Calculate the subtotal
+        let subtotal = cart.items.reduce((total, item) => {
             const itemPrice = item.itemId.sellPrice || item.itemId.price || 0;
             return total + (itemPrice * item.quantity);
         }, 0);
@@ -123,20 +123,36 @@ exports.getCart = async (req, res) => {
         // Apply coupon if provided
         let discount = 0;
         if (couponCode) {
-            const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
+            const coupon = await Coupon.findOne({ code: couponCode });
             if (coupon) {
                 if (coupon.discountType === 'percentage') {
-                    discount = (totalAmount * coupon.discountValue) / 100;
+                    discount = (subtotal * coupon.discountValue) / 100;
                 } else if (coupon.discountType === 'amount') {
                     discount = coupon.discountValue;
                 }
-                totalAmount -= discount;
+                subtotal -= discount;
             } else {
                 return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
             }
         }
 
-        res.status(200).json({ success: true, message: "Get user cart items", cart, totalAmount, discount });
+        //Define a fixed delivery fee (for example, 5)
+        const deliveryFee = 15;
+
+        //Calculate the total amount
+        const totalAmount = subtotal - deliveryFee;
+
+        res.status(200).json({
+            success: true,
+            message: "Get user cart items",
+            cart,
+            orderSummary: {
+                subtotal,
+                discount,
+                deliveryFee,
+                totalAmount
+            }
+        });
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -144,4 +160,5 @@ exports.getCart = async (req, res) => {
         });
     }
 };
+
 
