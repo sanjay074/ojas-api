@@ -90,7 +90,7 @@ exports.getOneCoures = async (req, res) => {
 
 exports.getAllFreeCoures = async (req, res) => {
   try {
-    const freeCourses = await Coures.find({ type: "free" }, { updatedAt: 0, _id: 0, __v: 0 }).sort({ createdAt: -1 });
+    const freeCourses = await Coures.find({ type: "free" }, { updatedAt: 0, __v: 0 }).sort({ createdAt: -1 });
     if (freeCourses.length === 0) {
       return res.status(400).json({ success: false, message: "No free courses available" })
     }
@@ -106,7 +106,7 @@ exports.getAllFreeCoures = async (req, res) => {
 
 exports.getAllpaidCoures = async (req, res) => {
   try {
-    const paidCourses = await Coures.find({ type: "paid" }, { updatedAt: 0, _id: 0, __v: 0 }).sort({ createdAt: -1 });
+    const paidCourses = await Coures.find({ type: "paid" }, { updatedAt: 0, __v: 0 }).sort({ createdAt: -1 });
     if (paidCourses.length === 0) {
       return res.status(400).json({ success: false, message: "No paid courses available" })
     }
