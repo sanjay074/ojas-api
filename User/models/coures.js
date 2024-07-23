@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const couresSchema = new mongoose.Schema(
   {
-    couresName:{
+    couresName: {
       type: String,
       required: true,
     },
@@ -10,9 +10,9 @@ const couresSchema = new mongoose.Schema(
       required: true,
     },
     totalPrice: {
-        type: Number,
-        required: true,
-      },
+      type: Number,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -25,11 +25,17 @@ const couresSchema = new mongoose.Schema(
       type: String,
     },
     type: {
-        type: String,
-        enum: ["free", "paid"],
-        default: "free",
-      },
-},
+      type: String,
+      enum: ["free", "paid"],
+      default: "free",
+    },
+    itemType: {
+      type: String,
+      required: true,
+      enum: ['Coures', 'Fabric'],
+      default: "Coures"
+    },
+  },
   { timestamps: true }
 );
 

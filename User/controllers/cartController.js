@@ -136,7 +136,7 @@ exports.getCart = async (req, res) => {
             }
         }
 
-        //Define a fixed delivery fee (for example, 5)
+        //Define a fixed delivery fee (for example, 5) 
         const deliveryFee = 15;
 
         //Calculate the total amount
