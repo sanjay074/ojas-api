@@ -17,9 +17,14 @@ const userSchema = new mongoose.Schema(
     profileImage: {
       type: String,
     },
+    gender: {
+      type: String,
+      enum: ["Male", "Female"],
+      default: "",
+    },
     agree: {
       type: Boolean,
-      default: false
+      default: true
     }
     // password:{
     //     type:String

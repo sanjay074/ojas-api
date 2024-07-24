@@ -3,6 +3,7 @@ const Cart = require("../models/cart");
 const Coures = require('../models/coures');
 const Coupon = require('../models/coupon');
 const Fabric = require('../models/fabricStore');
+
 exports.addToCart = async (req, res) => {
 
     const userId = req.user.id;
@@ -120,6 +121,12 @@ exports.getCart = async (req, res) => {
             return total + (itemPrice * item.quantity);
         }, 0);
 
+        // Calculate the totalPrice
+        let total = cart.items.reduce((total, item) => {
+            const itemPrice = item.itemId.totalPrice || item.itemId.price || 0;
+            return total + (itemPrice * item.quantity);
+        }, 0);
+
         // Apply coupon if provided
         let discount = 0;
         if (couponCode) {
@@ -134,6 +141,9 @@ exports.getCart = async (req, res) => {
             } else {
                 return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
             }
+        } else {
+
+            discount = total - subtotal;
         }
 
         //Define a fixed delivery fee (for example, 5) 

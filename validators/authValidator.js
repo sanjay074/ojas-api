@@ -22,7 +22,11 @@ const userUpdateProfileSchema = Joi.object({
   name: Joi.string().required(),
   dob: Joi.string().required(),
   email: Joi.string().required(),
-  agree: Joi.boolean().required()
+  agree: Joi.boolean(),
+  gender: Joi.string().valid('Male', 'Female').messages({
+    'any.only': 'Gender must be either Male or Female.',
+    'any.required': 'Gender is required.',
+  }),
 })
 
 const userLoginSchema = Joi.object({
@@ -208,6 +212,58 @@ const couponValidationSchema = Joi.object({
   })
 });
 
+
+
+
+const orderSchema = Joi.object({
+  // userId: Joi.string()
+  //   .pattern(/^[0-9a-fA-F]{24}$/)
+  //   .required()
+  //   .messages({
+  //     'string.base': 'User ID should be a string',
+  //     'string.pattern.base': 'User ID should be a valid MongoDB ObjectId',
+  //     'any.required': 'User ID is required',
+  //   }),
+  userAddress: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      'string.base': 'User Address id should be a string',
+      'string.pattern.base': 'User ID should be a valid MongoDB ObjectId',
+      'any.required': 'User Address id is required',
+    }),
+  products: Joi.array()
+    .items(
+      Joi.object({
+        productId: Joi.string()
+          .pattern(/^[0-9a-fA-F]{24}$/)
+          .required()
+          .messages({
+            'string.base': 'Product ID should be a string',
+            'string.pattern.base': 'Product ID should be a valid MongoDB ObjectId',
+            'any.required': 'Product ID is required',
+          }),
+        quantity: Joi.number()
+          .min(1)
+          .required()
+          .messages({
+            'number.base': 'Quantity should be a number',
+            'number.min': 'Quantity must be at least 1',
+            'any.required': 'Quantity is required',
+          })
+      })
+    )
+    .min(1)
+    .required()
+    .messages({
+      'array.base': 'Products should be an array',
+      'array.min': 'At least one product is required',
+      'any.required': 'Products are required',
+    })
+});
+
+
+
 module.exports = {
   registrationUserSchema,
   userLoginSchema,
@@ -224,5 +280,6 @@ module.exports = {
   bannerSchema,
   userAddressJoiSchema,
   updateUserAddressJoiSchema,
-  couponValidationSchema
+  couponValidationSchema,
+  orderSchema
 }
