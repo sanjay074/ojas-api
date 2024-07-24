@@ -1,7 +1,8 @@
 const UserAddress = require("../models/userAddress");
 const Order = require("../models/order");
 const User = require("../models/user");
-const { userAddressJoiSchema, updateUserAddressJoiSchema } = require("../../validators/authValidator");
+const Fabric = require("../models/fabricStore");
+const { userAddressJoiSchema, updateUserAddressJoiSchema, orderSchema } = require("../../validators/authValidator");
 const { default: mongoose } = require("mongoose");
 
 exports.addDeliveryAddress = async (req, res) => {
@@ -115,3 +116,99 @@ exports.updateDeliveryAddress = async (req, res) => {
         });
     }
 }
+
+
+exports.placeOrder = async (req, res) => {
+    try {
+        const { error, value } = orderSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details.map(detail => detail.message).join(', ') });
+        }
+        const { userAddress, products } = value;
+        const userId = req.user.id;
+        // Calculate total amount
+        let totalAmount = 0;
+        for (const item of products) {
+            const fabric = await Fabric.findById(item.productId);
+            if (!fabric) {
+                return res.status(400).json({ message: `Product with id ${item.productId} not found` });
+            }
+            totalAmount += fabric.price * item.quantity;
+        }
+
+        const order = new Order({
+            userId: userId,
+            userAddress,
+            products,
+            totalAmount,
+        });
+
+        await order.save();
+
+        return res.status(201).json({
+            status: true,
+            message: 'Order placed successfully',
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: false,
+            message: error.toString(),
+        })
+    }
+}
+
+
+
+exports.getOrderDetails = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const order = await Order.findById(orderId)
+            .populate('userId', 'name email')
+            .populate('userAddress')
+            .populate('products.productId', 'name price');
+
+        if (!order) {
+            return res.status(404).json({ status: false, message: 'Order not found' });
+        }
+
+        res.status(200).json({
+            status: true,
+            message: 'Order fetched successfully',
+            order,
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            status: false,
+            message: error.toString()
+        })
+    }
+}
+
+
+
+exports.adminGetOrderDetails = async (req, res) => {
+    try {
+        const order = await Order.find().populate('userId', 'name email')
+            .populate('userAddress')
+            .populate('products.productId', 'name price');
+
+        if (order.length === 0) {
+            return res.status(400).json({
+                status: false,
+                message: "No  available any order details", order
+            })
+        }
+        return res.status(200).json({
+            status: true,
+            message: "Order fetched successfully",
+            order,
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            status: false,
+            message: error.toString()
+        })
+    }
+} 

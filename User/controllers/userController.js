@@ -6,7 +6,7 @@ const cloudinary = require("../../utils/cloudinary");
 const { default: mongoose } = require("mongoose");
 exports.userUpdateProfile = async (req, res) => {
   try {
-    const { name, dob, email, agree } =
+    const { name, dob, email, agree, gender } =
       req.body;
     const { error } = userUpdateProfileSchema.validate(req.body);
     if (error) {
@@ -18,7 +18,7 @@ exports.userUpdateProfile = async (req, res) => {
         req.body,
         ({
           name,
-          dob, email, agree
+          dob, email, agree, gender
         },
           { upsert: true },
           { new: true })
