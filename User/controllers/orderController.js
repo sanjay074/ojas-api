@@ -158,10 +158,12 @@ exports.placeOrder = async (req, res) => {
 }
 
 
-
 exports.getOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({ status: 0, message: "Invalid order ID" });
+        }
         const order = await Order.findById(orderId)
             .populate('userId', 'name email')
             .populate('userAddress')
@@ -211,4 +213,5 @@ exports.adminGetOrderDetails = async (req, res) => {
             message: error.toString()
         })
     }
-} 
+}
+
