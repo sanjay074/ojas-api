@@ -1,4 +1,3 @@
-const { boolean } = require("joi");
 const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema(
   {
@@ -17,18 +16,16 @@ const userSchema = new mongoose.Schema(
     profileImage: {
       type: String,
     },
-    // gender: {
-    //   type: String,
-    //   enum: ["Male", "Female"],
-    //   default: "",
-    // },
+    gender: {
+      type: String,
+      enum: ["Male", "Female"],
+      default: "Male",
+    },
     agree: {
       type: Boolean,
       default: true
     }
-    // password:{
-    //     type:String
-    // }
+
   },
   { timestamps: true }
 );

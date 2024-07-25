@@ -23,10 +23,15 @@ exports.getCart = async (req, res) => {
             return total + (itemPrice * item.quantity);
         }, 0);
 
-        // Apply coupon if provided
+        let total = cart.item.reduce((total, item) => {
+            const itemPrice = item.itemId.sellPrice || item.itemId.price || 0;
+            return total + (itemPrice * item.quantity);
+        }, 0)
+
+        //Apply coupon if provided
         let discount = 0;
         if (couponCode) {
-            const coupon = await Coupon.findOne({ code: couponCode });
+            const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
             if (coupon) {
                 if (coupon.discountType === 'percentage') {
                     discount = (subtotal * coupon.discountValue) / 100;
@@ -39,7 +44,7 @@ exports.getCart = async (req, res) => {
             }
         }
 
-        //Define a fixed delivery fee (for example, 5)
+        //Define a fixed delivery fee for example,5)
         const deliveryFee = 15;
 
         //Calculate the total amount

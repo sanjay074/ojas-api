@@ -130,7 +130,7 @@ exports.getCart = async (req, res) => {
         //Apply coupon if provided
         let discount = 0;
         if (couponCode) {
-            const coupon = await Coupon.findOne({ code: couponCode });
+            const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
             if (coupon) {
                 if (coupon.discountType === 'percentage') {
                     discount = (subtotal * coupon.discountValue) / 100;

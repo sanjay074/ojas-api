@@ -18,7 +18,7 @@ exports.phoneLogin = (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-  if (req.body.phone === "9999999999" || req.body.phone === "8888888888") {
+  if (req.body.phone === "9999999999" || req.body.phone === "8888888888" || req.body.phone === "9793405249") {
     return res.status(200).send({
       success: true,
       details: "f7a3883f-840d-48a9-ac82-e59e47399eb3",
@@ -123,7 +123,7 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).send({ message: error.details[0].message });
     }
 
-    if (req.body.phone === "9999999999" || req.body.phone === "8888888888") {
+    if (req.body.phone === "9999999999" || req.body.phone === "8888888888" || req.body.phone === "9793405249") {
       const isAlreadyRegistered = await User.findOne({
         phone: req.body.phone,
       });
@@ -240,6 +240,7 @@ exports.registrationUser = async (req, res) => {
   }
 
 }
+
 
 exports.userLogin = async (req, res) => {
   try {
