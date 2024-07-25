@@ -139,6 +139,7 @@ exports.deleteCoures = async (req, res) => {
   }
 };
 
+
 exports.updateCoures = async (req, res) => {
   try {
     const courseId = req.params.id;

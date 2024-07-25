@@ -12,6 +12,7 @@ const { registrationUserSchema, userLoginSchema, phoneSchema, otpSchema } = requ
  * @date 11/06/2024
  * @author Sanjay Kumar
  **/
+
 exports.phoneLogin = (req, res) => {
   const { error } = phoneSchema.validate(req.body);
   if (error) {

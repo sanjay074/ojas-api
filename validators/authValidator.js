@@ -23,10 +23,10 @@ const userUpdateProfileSchema = Joi.object({
   dob: Joi.string().required(),
   email: Joi.string().required(),
   agree: Joi.boolean(),
-  gender: Joi.string().valid('Male', 'Female').messages({
-    'any.only': 'Gender must be either Male or Female.',
-    'any.required': 'Gender is required.',
-  }),
+  // gender: Joi.string().valid('Male', 'Female').messages({
+  //   'any.only': 'Gender must be either Male or Female.',
+  //   'any.required': 'Gender is required.',
+  // }),
 })
 
 const userLoginSchema = Joi.object({

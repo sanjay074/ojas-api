@@ -115,7 +115,7 @@ exports.getCart = async (req, res) => {
             return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, orderSummary: { subtotal: 0, discount: 0, deliveryFee: 0, totalAmount: 0 } });
         }
 
-        // Calculate the subtotal
+        // Calculate the subtotal 
         let subtotal = cart.items.reduce((total, item) => {
             const itemPrice = item.itemId.sellPrice || item.itemId.price || 0;
             return total + (itemPrice * item.quantity);
@@ -127,7 +127,7 @@ exports.getCart = async (req, res) => {
             return total + (itemPrice * item.quantity);
         }, 0);
 
-        // Apply coupon if provided
+        //Apply coupon if provided
         let discount = 0;
         if (couponCode) {
             const coupon = await Coupon.findOne({ code: couponCode });
