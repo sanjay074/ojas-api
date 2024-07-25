@@ -96,6 +96,8 @@ exports.removeFromCart = async (req, res) => {
 
 
 
+
+
 exports.getCart = async (req, res) => {
     const userId = req.user.id;
     const { couponCode } = req.body;
@@ -115,23 +117,19 @@ exports.getCart = async (req, res) => {
             return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, orderSummary: { subtotal: 0, discount: 0, deliveryFee: 0, totalAmount: 0 } });
         }
 
-        // Calculate the subtotal 
+        // Calculate the subtotal
         let subtotal = cart.items.reduce((total, item) => {
             const itemPrice = item.itemId.sellPrice || item.itemId.price || 0;
             return total + (itemPrice * item.quantity);
         }, 0);
 
-        // Calculate the totalPrice
-        let total = cart.items.reduce((total, item) => {
-            const itemPrice = item.itemId.totalPrice || item.itemId.price || 0;
-            return total + (itemPrice * item.quantity);
-        }, 0);
-
-        //Apply coupon if provided
+        // Apply coupon if provided
         let discount = 0;
         if (couponCode) {
             const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
+
             if (coupon) {
+                console.log(`Coupon found: ${coupon}`);
                 if (coupon.discountType === 'percentage') {
                     discount = (subtotal * coupon.discountValue) / 100;
                 } else if (coupon.discountType === 'amount') {
@@ -139,18 +137,19 @@ exports.getCart = async (req, res) => {
                 }
                 subtotal -= discount;
             } else {
+                console.log(`No valid coupon found for code: ${couponCode}`);
                 return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
             }
         } else {
-
-            discount = total - subtotal;
+            console.log('No coupon code provided');
+            discount = 0;
         }
 
-        //Define a fixed delivery fee (for example, 5) 
+        // Define a fixed delivery fee (for example, 15)
         const deliveryFee = 15;
 
-        //Calculate the total amount
-        const totalAmount = subtotal - deliveryFee;
+        // Calculate the total amount
+        const totalAmount = subtotal + deliveryFee;
 
         res.status(200).json({
             success: true,
@@ -164,11 +163,13 @@ exports.getCart = async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('Error getting cart:', error);
         return res.status(500).json({
             success: false,
             message: error.message.toString(),
         });
     }
 };
+
 
 
