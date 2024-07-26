@@ -51,7 +51,7 @@ exports.addToCart = async (req, res) => {
 
         if (itemIndex > -1) {
             if (itemType === 'Coures') {
-                return res.status(400).json({ status: false, message: 'This Coures item is already added to the cart' });
+                return res.status(400).json({ status: false, message: 'This Coures item is already added to the cart ' });
             } else {
                 cart.items[itemIndex].quantity += itemQuantity;
             }
@@ -68,6 +68,7 @@ exports.addToCart = async (req, res) => {
         })
     }
 };
+
 
 exports.removeFromCart = async (req, res) => {
     const { itemId, itemType } = req.body;
@@ -129,7 +130,7 @@ exports.getCart = async (req, res) => {
             const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
 
             if (coupon) {
-                console.log(`Coupon found: ${coupon}`);
+
                 if (coupon.discountType === 'percentage') {
                     discount = (subtotal * coupon.discountValue) / 100;
                 } else if (coupon.discountType === 'amount') {
@@ -137,11 +138,11 @@ exports.getCart = async (req, res) => {
                 }
                 subtotal -= discount;
             } else {
-                console.log(`No valid coupon found for code: ${couponCode}`);
+
                 return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
             }
         } else {
-            console.log('No coupon code provided');
+
             discount = 0;
         }
 
@@ -163,7 +164,7 @@ exports.getCart = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error getting cart:', error);
+
         return res.status(500).json({
             success: false,
             message: error.message.toString(),
