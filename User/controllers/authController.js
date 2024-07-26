@@ -18,7 +18,7 @@ exports.phoneLogin = (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-  if (req.body.phone === "9999999999" || req.body.phone === "8888888888") {
+  if (req.body.phone === "9999999999" || req.body.phone === "8888888888" || req.body.phone === "7777777777") {
     return res.status(200).send({
       success: true,
       details: "f7a3883f-840d-48a9-ac82-e59e47399eb3",
@@ -118,93 +118,70 @@ exports.phoneLogin = (req, res) => {
 
 exports.verifyOTP = async (req, res) => {
   try {
+    const { otp } = req.body;
+    const otpPattern = /^\d{6}$/;
+    if (!otpPattern.test(otp)) {
+      return res.status(400).json({ status: 0, message: "OTP must be exactly 6 digits." });
+    }
     const { error } = otpSchema.validate(req.body);
     if (error) {
       return res.status(400).send({ message: error.details[0].message });
     }
 
-    if (req.body.phone === "9999999999" || req.body.phone === "8888888888") {
-      const isAlreadyRegistered = await User.findOne({
-        phone: req.body.phone,
-      });
+    if (["9999999999", "8888888888", "7777777777"].includes(req.body.phone)) {
+      const isAlreadyRegistered = await User.findOne({ phone: req.body.phone });
       if (isAlreadyRegistered) {
         const _id = isAlreadyRegistered._id.toString();
-        const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
-          expiresIn: "30d",
-        });
-        return res.status(200).send({
-          message: "Welcome back",
-          token: token,
-        });
+        const token = jwt.sign({ id: _id }, process.env.JWT_SER, { expiresIn: "30d" });
+        return res.status(200).send({ message: "Welcome back", token });
       } else {
-        const createParent = new User({
-          phone: req.body.phone,
-        });
+        const createParent = new User({ phone: req.body.phone });
         try {
           const result = await createParent.save();
           const _id = result._id.toString();
-          const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
-            expiresIn: "30d",
-          });
-          return res.status(200).send({
-            message: "Registered successful",
-            token: token,
-          });
+          const token = jwt.sign({ id: _id }, process.env.JWT_SER, { expiresIn: "30d" });
+          return res.status(200).send({ message: "Registered successfully", token });
         } catch (e) {
-          console.log(e);
+          console.error(e);
           return res.status(500).send({ message: "Something bad happened" });
         }
       }
     }
-
+    const url = `https://2factor.in/API/V1/ad542ca6-24b4-11ef-8b60-0200cd936042/SMS/VERIFY/${req.body.details}/${req.body.otp}`;
     try {
-      const response = await axios.get(
-        `https://2factor.in/API/V1/ad542ca6-24b4-11ef-8b60-0200cd936042/SMS/VERIFY/${req.body.details}/${req.body.otp}`
-      );
-
+      const response = await axios.get(url);
       if (response.data.Details === "OTP Matched") {
-        const isAlreadyRegistered = await User.findOne({
-          phone: req.body.phone,
-        });
+        const isAlreadyRegistered = await User.findOne({ phone: req.body.phone });
         if (isAlreadyRegistered) {
           const _id = isAlreadyRegistered._id.toString();
-          const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
-            expiresIn: "30d",
-          });
-          return res.status(200).send({
-            message: "Welcome back",
-            token: token,
-          });
+          const token = jwt.sign({ id: _id }, process.env.JWT_SER, { expiresIn: "30d" });
+          return res.status(200).send({ message: "Welcome back", token });
         } else {
-          const createParent = new User({
-            phone: req.body.phone,
-          });
+          const createParent = new User({ phone: req.body.phone });
           try {
             const result = await createParent.save();
             const _id = result._id.toString();
-            const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
-              expiresIn: "30d",
-            });
-            return res.status(200).send({
-              message: "Registered successful",
-              token: token,
-            });
+            const token = jwt.sign({ id: _id }, process.env.JWT_SER, { expiresIn: "30d" });
+            return res.status(200).send({ message: "Registered successfully", token });
           } catch (e) {
-            console.log(e);
+            console.error(e);
             return res.status(500).send({ message: "Something bad happened" });
           }
         }
       } else if (response.data.Details === "OTP Expired") {
         return res.status(403).send({ message: "OTP Expired" });
+      } else {
+        return res.status(400).send({ message: "Invalid OTP" });
       }
     } catch (error) {
-      return res.status(500).json(error);
+      return res.status(500).json(error.response ? error.response.data : { message: "Error verifying OTP" });
     }
   } catch (e) {
-    console.log(e);
+
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 
 
 
@@ -240,6 +217,7 @@ exports.registrationUser = async (req, res) => {
   }
 
 }
+
 
 exports.userLogin = async (req, res) => {
   try {

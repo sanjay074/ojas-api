@@ -117,7 +117,7 @@ exports.DeleteUser = async (req, res) => {
 
 exports.userProfileDetails = async (req, res) => {
   try {
-    const userDetails = await User.findById(req.user.id, { __v: 0, _id: 0 });
+    const userDetails = await User.findById(req.user.id, { __v: 0, _id: 0, agree: 0, createdAt: 0, updatedAt: 0 });
     return res.status(200).json({ status: true, message: "Get user details successfully", userDetails })
   } catch (error) {
     return res.status(500).json({
