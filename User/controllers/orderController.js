@@ -38,10 +38,6 @@ exports.addDeliveryAddress = async (req, res) => {
     }
 };
 
-
-
-
-
 exports.getUserDeliveryAddress = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -78,8 +74,7 @@ exports.getUserDeliveryAddress = async (req, res) => {
             message: error.message,
         });
     }
-};
-
+}
 
 exports.updateDeliveryAddress = async (req, res) => {
     try {
@@ -214,4 +209,79 @@ exports.adminGetOrderDetails = async (req, res) => {
         })
     }
 }
+
+exports.adminUpdateOrderStatus = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({
+                status: 0,
+                message: "Order id invaild"
+            })
+        }
+        const order = Order.findOne(orderId);
+        if (!order) {
+            return res.status(400).json({
+                status: 0,
+                message: "Order id not found"
+            })
+        }
+        const { status } = req.body;
+        const orderStatus = await Order.findByIdAndUpdate(orderId, { status: status });
+        return res.status(200).json({
+            status: true,
+            message: "Order status update successfully",
+        })
+
+    } catch (error) {
+        return res.status(200).json({
+            status: false,
+            message: error.toString()
+        })
+    }
+}
+
+exports.findByUserIdAndCancelledOrder = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const cancelledOrder = await Order.find({ userId: userId, status: "Cancelled" }).populate('userId', 'name email')
+            //.populate('userAddress')
+            .populate('products.productId', 'name price imageUrl title discount totalPrice');
+        return res.status(200).json({
+            status: true,
+            message: "Cancelled order fetched successfully",
+            cancelledOrder,
+        })
+    } catch (error) {
+        return res.status(200).json({
+            status: false,
+            message: error.toString()
+        })
+    }
+}
+
+
+exports.findByUserIdAndDeliveredOrder = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const deliveredOrder = await Order.find({ userId: userId, status: "Delivered" }).populate('userId', 'name email')
+            //.populate('userAddress')
+            .populate('products.productId', 'name price imageUrl title discount totalPrice');
+        return res.status(200).json({
+            status: true,
+            message: "Delivered  order fetched successfully",
+            deliveredOrder,
+        })
+    } catch (error) {
+        return res.status(200).json({
+            status: false,
+            message: error.toString()
+        })
+    }
+}
+
+
+
+
+
 

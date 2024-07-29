@@ -142,7 +142,7 @@ exports.userProfileDetails = async (req, res) => {
 
 exports.userGetOrderDetails = async (req, res) => {
   try {
-    const order = await Order.findOne({ userId: req.user.id })
+    const order = await Order.find({ "userId": req.user.id })
       .populate('userId', 'name email')
       .populate('userAddress')
       .populate('products.productId', 'name price');
