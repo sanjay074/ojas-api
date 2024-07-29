@@ -43,78 +43,6 @@ exports.phoneLogin = (req, res) => {
     });
 };
 
-/**
- * @param {*} req
- * @param {*} res
- * @returns data
- * @description  🙂🙂🙂User verifyOTP 🙂🙂🙂
- * @date 11/06/2024
- * @author Sanjay Kumar
- **/
-// exports.verifyOTP = (req, res) => {
-
-//   try {
-//     const { error } = otpSchema.validate(req.body);
-//     if (error) {
-//       return res.status(400).json({ message: error.details[0].message });
-//       return;
-//     }
-//     axios
-//       .get(
-//         "https://2factor.in/API/V1/ad542ca6-24b4-11ef-8b60-0200cd936042/SMS/VERIFY/" +
-//         req.body.details +
-//         "/" +
-//         req.body.otp
-//       )
-//       .then(async (response) => {
-//         if (response.data.Details === "OTP Matched") {
-//           const isAlreadyRegistered = await User.findOne({
-//             phone: req.body.phone,
-//           }).lean();
-//           if (isAlreadyRegistered) {
-//             const _id = isAlreadyRegistered._id.toString();
-//             const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
-//               expiresIn: "30d",
-//             });
-//             return res.status(200).send({
-//               message: "Welcome back",
-//               token: token,
-//             });
-//           }
-//           const createParent = new User({
-//             phone: req.body.phone,
-//           });
-//           createParent
-//             .save()
-//             .then(async (result) => {
-//               const _id = result._id.toString();
-//               const token = jwt.sign({ id: _id }, process.env.JWT_SER, {
-//                 expiresIn: "30d",
-//               });
-
-//               return res.status(200).send({
-//                 message: "Registered successful",
-//                 token: token,
-//               });
-//             })
-//             .catch((error) => {
-//               console.log(error);
-//               return res
-//                 .status(500)
-//                 .send({ message: "Something bad happened" });
-//             });
-//         } else if (response.data.Details === "OTP Expired") {
-//           return res.status(403).send({ message: "OTP Expired" });
-//         }
-//       })
-//       .catch((error) => {
-//         return res.status(403).json({ message: "Invalid OTP" });
-//       });
-//   } catch (e) {
-//     console.log(e);
-//     return res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
 
 exports.verifyOTP = async (req, res) => {
   try {
@@ -174,7 +102,12 @@ exports.verifyOTP = async (req, res) => {
         return res.status(400).send({ message: "Invalid OTP" });
       }
     } catch (error) {
-      return res.status(500).json(error.response ? error.response.data : { message: "Error verifying OTP" });
+      if (error.response.data.Details === "OTP Mismatch") {
+        return res.status(400).send({ status: false, message: "Invalid OTP" });
+      } else if (error.response.data.Details === "Invalid API / SessionId Combination - No Entry Exists") {
+        return res.status(400).send({ status: false, message: "Invalid details id" });
+      }
+      return res.status(400).json(error.response ? error.response.data : { message: "Error verifying OTP" });
     }
   } catch (e) {
 
