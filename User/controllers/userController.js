@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Coures = require("../models/coures");
 const Class = require("../models/class");
+const Order = require("../models/order");
 const { userUpdateProfileSchema } = require("../../validators/authValidator");
 const cloudinary = require("../../utils/cloudinary");
 const { default: mongoose } = require("mongoose");
@@ -123,6 +124,32 @@ exports.userProfileDetails = async (req, res) => {
     return res.status(500).json({
       status: 0,
       message: error.message.toString(),
+    })
+  }
+}
+
+
+exports.userGetOrderDetails = async (req, res) => {
+  try {
+    const order = await Order.findOne({ userId: req.user.id })
+      .populate('userId', 'name email')
+      .populate('userAddress')
+      .populate('products.productId', 'name price');
+
+    if (!order) {
+      return res.status(404).json({ status: false, message: 'Order not found' });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: 'Order fetched successfully',
+      order,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: error.toString()
     })
   }
 }
