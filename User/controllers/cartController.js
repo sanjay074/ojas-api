@@ -124,6 +124,12 @@ exports.getCart = async (req, res) => {
             return total + (itemPrice * item.quantity);
         }, 0);
 
+        // Calculate the totalPrice
+        let total = cart.items.reduce((total, item) => {
+            const itemPrice = item.itemId.totalPrice || item.itemId.price || 0;
+            return total + (itemPrice * item.quantity);
+        }, 0);
+
         // Apply coupon if provided
         let discount = 0;
         if (couponCode) {
@@ -143,11 +149,12 @@ exports.getCart = async (req, res) => {
             }
         } else {
 
-            discount = 0;
+            discount = total - subtotal;
         }
 
         // Define a fixed delivery fee (for example, 15)
         const deliveryFee = 15;
+
 
         // Calculate the total amount
         const totalAmount = subtotal + deliveryFee;

@@ -102,9 +102,9 @@ exports.verifyOTP = async (req, res) => {
         return res.status(400).send({ message: "Invalid OTP" });
       }
     } catch (error) {
-      if (error.response.data.Details === "OTP Mismatch") {
+      if (error?.response?.data?.Details === "OTP Mismatch") {
         return res.status(400).send({ status: false, message: "Invalid OTP" });
-      } else if (error.response.data.Details === "Invalid API / SessionId Combination - No Entry Exists") {
+      } else if (error?.response?.data?.Details === "Invalid API / SessionId Combination - No Entry Exists") {
         return res.status(400).send({ status: false, message: "Invalid details id" });
       }
       return res.status(400).json(error.response ? error.response.data : { message: "Error verifying OTP" });
