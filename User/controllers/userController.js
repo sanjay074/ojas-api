@@ -2,7 +2,7 @@ const User = require("../models/user");
 const Coures = require("../models/coures");
 const Class = require("../models/class");
 const Order = require("../models/order");
-const multer = require("multer")
+
 const { userUpdateProfileSchema } = require("../../validators/authValidator");
 const cloudinary = require("../../utils/cloudinary");
 const { default: mongoose } = require("mongoose");
@@ -96,15 +96,6 @@ exports.profileImageUpload = async (req, res) => {
     });
   }
 };
-
-
-
-
-
-
-
-
-
 
 
 exports.DeleteUser = async (req, res) => {
