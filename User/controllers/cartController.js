@@ -180,4 +180,38 @@ exports.getCart = async (req, res) => {
 };
 
 
+exports.updateItemQuantity = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { itemId, itemType, action } = req.body;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'User ID is required' });
+        }
+        const cart = await Cart.findOne({ userId }).exec();
+        if (!cart) {
+            return res.status(400).json({ success: false, message: 'Cart not found' });
+        }
+        const itemIndex = cart.items.findIndex(
+            item => item.itemId.toString() === itemId && item.itemType === itemType
+        );
+        if (itemIndex === -1) {
+            return res.status(400).json({ success: false, message: 'Item not found in cart' });
+        }
 
+        if (action === 'increment') {
+            cart.items[itemIndex].quantity += 1;
+        } else if (action === 'decrement') {
+            cart.items[itemIndex].quantity = Math.max(0, cart.items[itemIndex].quantity - 1);
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid action' });
+        }
+        await cart.save();
+        return res.status(200).json({ success: true, message: 'Item quantity updated successfully' });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message.toString(),
+        });
+    }
+}
