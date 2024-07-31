@@ -51,7 +51,7 @@ const adminUserLoginSchema = Joi.object({
 
 const addCouresSchema = Joi.object({
   couresName: Joi.string().required(),
-  sellPrice: Joi.number().required(),
+  discount: Joi.number().required(),
   totalPrice: Joi.number().required(),
   title: Joi.string().required(),
   description: Joi.string().required(),

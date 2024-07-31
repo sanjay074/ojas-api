@@ -24,7 +24,8 @@ exports.addCoures = async (req, res) => {
           message: error.message.toString(),
         });
       }
-      const { couresName, sellPrice, totalPrice, title, description, type } = req.body;
+      const { couresName,totalPrice, title, discount, description, type } = req.body;
+      const discountedPrice = totalPrice - (totalPrice * (discount / 100));
       const exist = await Coures.findOne({ couresName });
       if (exist) {
         return res.status(400).json({
@@ -34,10 +35,11 @@ exports.addCoures = async (req, res) => {
       }
       const addCoures = new Coures({
         couresName,
-        sellPrice,
+        price:discountedPrice,
         title,
         totalPrice,
         description,
+        discount,
         type,
         imageUrl: result.secure_url
       })
