@@ -148,24 +148,51 @@ exports.updateCoures = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
       return res.status(400).json({ success: false, message: "Invalid course ID" });
     }
-    const updateData = req.body;
-
-    if (req.file) {
-      const result = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }).end(req.file.buffer);
+    if (!req.file) {
+      return res.status(400).json({
+          status: 0,
+          message: "Missing required parameter - file"
       });
-
-      updateData.imageUrl = result.secure_url;
+  }
+  const coures = await Coures.findById(courseId);
+  if(!coures){
+    return res.status(404).json({
+      status: 0,
+      message: "Coures not found"
+  });
+  }
+  const oldImageUrl = coures.imageUrl;
+  const oldPublicId = oldImageUrl.split('/').pop().split('.')[0];
+  cloudinary.uploader.destroy(oldPublicId, async (error, result) => {
+    if (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message.toString(),
+        });
     }
-    const updateCoures = await Coures.findByIdAndUpdate(courseId, updateData, { new: true });
-    return res.status(200).json({
-      success: true,
-      message: "Coures data update successfully",
-      updateCoures,
-    });
+    cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
+        if (error) {
+            return res.status(500).json({
+                status: 0,
+                message: error.message.toString(),
+            });
+        }
+        const {discount,totalPrice } = req.body;
+        const discountedPrice = totalPrice - (totalPrice * (discount / 100));
+        coures.imageUrl = result.secure_url;
+        coures.price=discountedPrice;
+        coures.couresName = req.body.couresName || coures.couresName;
+        coures.title = req.body.title || coures.title;
+        coures.totalPrice=req.body.totalPrice || coures.totalPrice;
+        coures.discount=req.body.discount || coures.discount;
+        await coures.save();
+        return res.status(200).json({
+            success: true,
+            message: "Coures data updated successfully",
+        });
+    }).end(req.file.buffer);
+});
+
   } catch (error) {
     return res.status(500).json({
       status: 0,
