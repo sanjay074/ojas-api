@@ -72,6 +72,9 @@ exports.addToCart = async (req, res) => {
 
 exports.removeFromCart = async (req, res) => {
     const { itemId, itemType } = req.body;
+    if(!mongoose.Types.ObjectId.isValid(itemId)){
+        return res.status(400).json({ success: false, message: "Invalid item ID" });
+    }
     const userId = req.user.id;
     if (!itemId || !itemType) {
         return res.status(400).json({ status: false, message: 'Item ID, and Item Type are required' });
@@ -184,6 +187,9 @@ exports.updateItemQuantity = async (req, res) => {
     try {
         const userId = req.user.id;
         const { itemId, itemType, action } = req.body;
+        if(!mongoose.Types.ObjectId.isValid(itemId)){
+            return res.status(400).json({ success: false, message: "Invalid item ID" });
+        }
         if (!userId) {
             return res.status(400).json({ success: false, message: 'User ID is required' });
         }
@@ -215,3 +221,72 @@ exports.updateItemQuantity = async (req, res) => {
         });
     }
 }
+
+
+
+
+exports.buyNowOrderAndApplyCouponCode = async (req, res) => {
+    try {
+        const { itemId, itemType, couponCode } = req.body;
+        if(!mongoose.Types.ObjectId.isValid(itemId)){
+            return res.status(400).json({ success: false, message: "Invalid item ID" });
+        }
+        if (!itemId || !itemType) {
+            return res.status(400).json({ status: false, message: 'Item ID, and Item Type are required' });
+        }
+        let item, discount, subtotal, totalAmount;
+        if (itemType === "Coures") {
+            item = await Coures.findOne({ _id: itemId, itemType: itemType });
+        } else if (itemType === "Fabric") {
+            item = await Fabric.findOne({ _id: itemId, itemType: itemType });
+        } else {
+            return res.status(400).json({ success: false, message: "Invalid item type" });
+        }
+
+        if (!item) {
+            return res.status(400).json({ success: false, message: `${itemType} not found` });
+        }
+
+        subtotal = item.price;
+        const deliveryFee = 15;
+
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
+
+            if (coupon) {
+                if (coupon.discountType === 'percentage') {
+                    discount = (subtotal * coupon.discountValue) / 100;
+                } else if (coupon.discountType === 'amount') {
+                    discount = coupon.discountValue;
+                }
+                subtotal -= discount;
+            } else {
+                return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
+            }
+        } else {
+            discount = item.totalPrice - subtotal; 
+        }
+
+        totalAmount = subtotal + deliveryFee;
+
+        res.status(200).json({
+            success: true,
+            message: "Get item order summary",
+            item,
+            orderSummary: {
+                subtotal,
+                discount,
+                deliveryFee,
+                totalAmount
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message.toString(),
+        });
+    }
+};
+
+
