@@ -90,18 +90,19 @@ exports.getCart = async (req, res) => {
             return res.status(200).json({ success: true, message: "User cart is empty", cart: { items: [] }, orderSummary: { subtotal: 0, discount: 0, deliveryFee: 0, totalAmount: 0 } });
         }
 
-        // Calculate the subtotal 
+        //Calculate the subtotal 
         let subtotal = cart.items.reduce((total, item) => {
             const itemPrice = item.itemId.sellPrice || item.itemId.price || 0;
             return total + (itemPrice * item.quantity);
         }, 0);
-
-        // Calculate the totalPrice
+        
+        //Calculate the totalPrice
         let total = cart.items.reduce((total, item) => {
             const itemPrice = item.itemId.totalPrice || item.itemId.price || 0;
             return total + (itemPrice * item.quantity);
         }, 0);
-
+        
+        
         //Apply coupon if provided
         let discount = 0;
         if (couponCode) {
@@ -121,6 +122,7 @@ exports.getCart = async (req, res) => {
             discount = total - subtotal;
         }
 
+    
         //Define a fixed delivery fee (for example, 5) 
         const deliveryFee = 15;
 
@@ -145,3 +147,64 @@ exports.getCart = async (req, res) => {
         });
     }
 }
+
+
+
+
+
+exports.buyNowOrderAndApplyCouponCode = async (req, res) => {
+    try {
+        const { itemId, itemType, couponCode } = req.body;
+        
+        if (itemType === "Coures") {
+            const coures = await Coures.findOne({ _id: itemId, itemType: itemType }); 
+            
+            if (!coures) {
+                return res.status(400).json({ success: false, message: "Course not found" });
+            }
+            
+            let discount = 0;
+            let subtotal = coures.price;
+            const deliveryFee = 15;
+            
+            if (couponCode) {
+                const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
+    
+                if (coupon) {
+                    if (coupon.discountType === 'percentage') {
+                        discount = (subtotal * coupon.discountValue) / 100;
+                    } else if (coupon.discountType === 'amount') {
+                        discount = coupon.discountValue;
+                    }
+                    subtotal -= discount;
+                } else {
+                    return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
+                }
+            }
+
+            const totalAmount = subtotal + deliveryFee;
+            
+            res.status(200).json({
+                success: true,
+                message: "Get item order summary",
+                coures,
+                orderSummary: {
+                    subtotal,
+                    discount,
+                    deliveryFee,
+                    totalAmount
+                }
+            });
+        } else {
+            return res.status(400).json({ success: false, message: "Invalid item type" });
+        }
+        
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message.toString(),
+        });
+    }
+};
+
+

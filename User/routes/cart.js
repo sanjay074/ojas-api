@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { verifyTokenAndUser } = require("../../middlewares/auth");
-const { addToCart, removeFromCart, getCart, updateItemQuantity } = require("../controllers/cartController");
+const { addToCart, removeFromCart, getCart, updateItemQuantity,buyNowOrderAndApplyCouponCode } = require("../controllers/cartController");
 router.post('/add', verifyTokenAndUser, addToCart);
 router.post('/remove', verifyTokenAndUser, removeFromCart);
 router.post('/getCart', verifyTokenAndUser, getCart);
 router.put('/updateItemQuantity', verifyTokenAndUser, updateItemQuantity);
-
+router.post('/orderSummary',buyNowOrderAndApplyCouponCode);
 module.exports = router;

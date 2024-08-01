@@ -215,3 +215,63 @@ exports.updateItemQuantity = async (req, res) => {
         });
     }
 }
+
+
+exports.buyNowOrderAndApplyCouponCode = async (req, res) => {
+    try {
+        const { itemId, itemType, couponCode } = req.body;
+        
+        if (itemType === "Coures") {
+            const coures = await Coures.findOne({ _id: itemId, itemType: itemType }); 
+            
+            if (!coures) {
+                return res.status(400).json({ success: false, message: "Course not found" });
+            }
+            
+            let discount = 0;
+            let totalAmountl = coures.totalPrice
+            let subtotal = coures.price;
+            const deliveryFee = 15;
+            
+            if (couponCode) {
+                const coupon = await Coupon.findOne({ code: couponCode, expirationDate: { $gte: new Date() } });
+    
+                if (coupon) {
+                    if (coupon.discountType === 'percentage') {
+                        discount = (subtotal * coupon.discountValue) / 100;
+                    } else if (coupon.discountType === 'amount') {
+                        discount = coupon.discountValue;
+                    }
+                    subtotal -= discount;
+                } else {
+                    return res.status(400).json({ success: false, message: 'Invalid or expired coupon' });
+                }
+            }else{
+                discount=totalAmountl-subtotal
+            }
+
+            const totalAmount = subtotal + deliveryFee;
+            
+            res.status(200).json({
+                success: true,
+                message: "Get item order summary",
+                coures,
+                orderSummary: {
+                    subtotal,
+                    discount,
+                    deliveryFee,
+                    totalAmount
+                }
+            });
+        } else {
+            return res.status(400).json({ success: false, message: "Invalid item type" });
+        }
+        
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message.toString(),
+        });
+    }
+};
+
