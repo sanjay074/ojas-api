@@ -87,6 +87,12 @@ exports.updateDeliveryAddress = async (req, res) => {
         }
         const userId = req.user.id;
         const userAddressId= req.params.id;
+        if(!mongoose.Types.ObjectId.isValid(userAddressId)){
+            return res.status(400).json({
+                success:false,
+                message:"Id not found"
+            })
+        }
         const userAddress = await UserAddress.findById(userAddressId);
         if (!userAddress) {
             return res.status(404).json({
@@ -106,7 +112,7 @@ exports.updateDeliveryAddress = async (req, res) => {
         userAddress.deliveryAddress.landmark=req.body.deliveryAddress.landmark;
         userAddress.deliveryAddress.addressType=req.body.deliveryAddress.addressType;
         await userAddress.save();
-
+    
         return res.status(200).json({
             success: true,
             message: 'Delivery address updated successfully',
@@ -114,8 +120,33 @@ exports.updateDeliveryAddress = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message,
+            message: error.message.toString(),
         });
+    }
+}
+
+exports.removeDeliveryAddress = async (req,res)=>{
+    try{
+     const id = req.params.id;
+     if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(400).json({
+              success:false,
+              message:"Invalid user address ID"
+        })
+     }
+     const removeAddress = await UserAddress.findByIdAndDelete(id);
+     if (!removeAddress) {
+        return res.status(400).json({ success: false, message: "UserAddress not found with this ID" })
+      }
+     return res.status(200).json({
+        success:true,
+        message:"Remove delivery address successfully"
+     })
+    }catch(error){
+        return res.status(500).json({
+            success: false,
+            message: error.message.toString(),
+        })
     }
 }
 

@@ -128,7 +128,7 @@ exports.deleteCoures = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
       return res.status(400).json({ success: false, message: "Invalid course ID" });
     }
-    const getOneCoures = await Coures.findByIdAndDelete(req.params.id);
+    const getOneCoures = await Coures.findByIdAndDelete(courseId);
     if (!getOneCoures) {
       return res.status(400).json({ success: false, message: "Course not found with this ID" })
     }

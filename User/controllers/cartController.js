@@ -98,10 +98,6 @@ exports.removeFromCart = async (req, res) => {
     }
 };
 
-
-
-
-
 exports.getCart = async (req, res) => {
     const userId = req.user.id;
     const { couponCode } = req.body;
