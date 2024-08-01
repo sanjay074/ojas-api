@@ -219,9 +219,6 @@ exports.updateItemQuantity = async (req, res) => {
     }
 }
 
-
-
-
 exports.buyNowOrderAndApplyCouponCode = async (req, res) => {
     try {
         const { itemId, itemType, couponCode } = req.body;
