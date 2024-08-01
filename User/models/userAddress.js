@@ -9,7 +9,6 @@ const UserAddressSchema = new mongoose.Schema({
    email: {
       type: String,
       required: true,
-      unique: true
    },
    mobileNumber: {
       type: String,
@@ -35,7 +34,18 @@ const UserAddressSchema = new mongoose.Schema({
       },
       houseNo: {
          type: Number
-      }
+      },
+      fullAddress:{
+         type:String,
+      },
+      addressType: {
+         type: String,
+         enum: ['Home', 'Work'],
+         default: "Home"
+       },
+       landmark:{
+         type:String
+       }
 
    },
 }, { timestamps: true })

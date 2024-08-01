@@ -162,6 +162,16 @@ const userAddressJoiSchema = Joi.object({
       'number.base': 'Pin code must be a number.',
     }),
     houseNo: Joi.number().optional(),
+    fullAddress:Joi.string().required().messages({
+      'any.required': 'fullAddress is required.',
+    }),
+    landmark:Joi.string().required().messages({
+      'any.required': 'landmark is required.',
+    }),
+    addressType: Joi.string().valid('Home', 'Work').messages({
+      'any.only': 'Address type must be either Home or Work.',
+      'any.required': 'Address type is required.',
+    }),
   }).required(),
 });
 
@@ -191,6 +201,16 @@ const updateUserAddressJoiSchema = Joi.object({
       'number.base': 'Pin code must be a number.',
     }),
     houseNo: Joi.number().optional(),
+    fullAddress:Joi.string().required().messages({
+      'any.required': 'fullAddress is required.',
+    }),
+    landmark:Joi.string().required().messages({
+      'any.required': 'landmark is required.',
+    }),
+    addressType: Joi.string().valid('Home', 'Work').messages({
+      'any.only': 'Address type must be either Home or Work.',
+      'any.required': 'Address type is required.',
+    }),
   }).required(),
 });
 

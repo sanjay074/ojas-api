@@ -22,7 +22,10 @@ exports.addDeliveryAddress = async (req, res) => {
                 distrct: deliveryAddress.distrct,
                 city: deliveryAddress.city,
                 pinCode: deliveryAddress.pinCode,
-                houseNo: deliveryAddress.houseNo
+                houseNo: deliveryAddress.houseNo,
+                fullAddress:deliveryAddress.fullAddress,
+                addressType:deliveryAddress.addressType,
+                landmark:deliveryAddress.landmark,
             }
         });
         const saveDeliveryAddress = await newAddress.save();
@@ -48,7 +51,7 @@ exports.getUserDeliveryAddress = async (req, res) => {
                 message: 'User not found',
             });
         }
-        const userAddress = await UserAddress.findOne({ userId: new mongoose.Types.ObjectId(userId) });
+        const userAddress = await UserAddress.find({ userId: new mongoose.Types.ObjectId(userId) });
         if (!userAddress) {
             return res.status(404).json({
                 success: false,
@@ -83,7 +86,8 @@ exports.updateDeliveryAddress = async (req, res) => {
             return res.status(400).json({ success: false, message: error.details[0].message });
         }
         const userId = req.user.id;
-        const userAddress = await UserAddress.findOne({ userId });
+        const userAddressId= req.params.id;
+        const userAddress = await UserAddress.findById(userAddressId);
         if (!userAddress) {
             return res.status(404).json({
                 success: false,
@@ -98,6 +102,9 @@ exports.updateDeliveryAddress = async (req, res) => {
         userAddress.deliveryAddress.city = req.body.deliveryAddress.city;
         userAddress.deliveryAddress.pinCode = req.body.deliveryAddress.pinCode;
         userAddress.deliveryAddress.houseNo = req.body.deliveryAddress.houseNo;
+        userAddress.deliveryAddress.fullAddress=req.body.deliveryAddress.fullAddress;
+        userAddress.deliveryAddress.landmark=req.body.deliveryAddress.landmark;
+        userAddress.deliveryAddress.addressType=req.body.deliveryAddress.addressType;
         await userAddress.save();
 
         return res.status(200).json({
