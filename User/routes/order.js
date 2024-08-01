@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { verifyTokenAndUser, verifyTokenAndAdmin } = require("../../middlewares/auth");
-const { addDeliveryAddress, getUserDeliveryAddress, updateDeliveryAddress, placeOrder, getOrderDetails, adminGetOrderDetails, adminUpdateOrderStatus, findByUserIdAndCancelledOrder, findByUserIdAndDeliveredOrder } = require("../controllers/orderController");
+const { addDeliveryAddress, getUserDeliveryAddress, updateDeliveryAddress, placeOrder, getOrderDetails, adminGetOrderDetails, adminUpdateOrderStatus, findByUserIdAndCancelledOrder, findByUserIdAndDeliveredOrder,removeDeliveryAddress } = require("../controllers/orderController");
 router.post("/deliveryAddress", verifyTokenAndUser, addDeliveryAddress);
 router.get("/getDeliveryAddress", verifyTokenAndUser, getUserDeliveryAddress);
 router.put("/updateAddress/:id", verifyTokenAndUser, updateDeliveryAddress);
@@ -11,6 +11,6 @@ router.get("/adminGetOrderDetails", verifyTokenAndAdmin, adminGetOrderDetails);
 router.put("/updateOrderStatus/:id", verifyTokenAndAdmin, adminUpdateOrderStatus);
 router.get("/cancelledOrder", verifyTokenAndUser, findByUserIdAndCancelledOrder);
 router.get("/deliveredOrder", verifyTokenAndUser, findByUserIdAndDeliveredOrder);
-
+router.delete("/removeAddress/:id",verifyTokenAndUser,removeDeliveryAddress);
 module.exports = router;
 
