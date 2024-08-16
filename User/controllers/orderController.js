@@ -307,7 +307,7 @@ exports.findByUserIdAndDeliveredOrder = async (req, res) => {
             .populate('products.productId', 'name price imageUrl title discount totalPrice');
         return res.status(200).json({
             status: true,
-            message: "Delivered  order fetched successfully",
+            message: "Delivered  order fetched  successfully",
             deliveredOrder,
         })
     } catch (error) {
@@ -317,6 +317,7 @@ exports.findByUserIdAndDeliveredOrder = async (req, res) => {
         })
     }
 }
+
 
 
 

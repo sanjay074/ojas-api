@@ -37,6 +37,7 @@ exports.addCoupon = async (req, res) => {
     }
 };
 
+
 exports.getAllCoupon = async (req, res) => {
     try {
         const coupon = await Coupon.find().sort({ createdAt: -1 })
