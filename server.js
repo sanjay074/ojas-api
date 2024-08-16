@@ -42,6 +42,13 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(cors());
+app.use((req, res, next) => {
+  res.status(404).json({
+      status:false,
+      error: 'API URL not found',
+      message: `The requested URL ${req.originalUrl} was not found on this server.`,
+  });
+});
 
 app.use("/api/auth", Auth);
 app.use("/api/auth", AdminAuth);

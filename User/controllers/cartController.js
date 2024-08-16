@@ -5,7 +5,7 @@ const Coupon = require('../models/coupon');
 const Fabric = require('../models/fabricStore');
 
 exports.addToCart = async (req, res) => {
-
+    
     const userId = req.user.id;
     const { couresId, fabricId, quantity } = req.body;
 
@@ -48,7 +48,7 @@ exports.addToCart = async (req, res) => {
         const itemIndex = cart.items.findIndex(
             (i) => i.itemId.toString() === (couresId || fabricId) && i.itemType === itemType
         );
-
+        
         if (itemIndex > -1) {
             if (itemType === 'Coures') {
                 return res.status(400).json({ status: false, message: 'This Coures item is already added to the cart ' });
@@ -60,7 +60,7 @@ exports.addToCart = async (req, res) => {
         }
 
         await cart.save();
-        res.status(200).json({ status: true, message: "Item add to cart sucessfully" });
+        res.status(200).json({ status: true, message: "Item add to cart sucessfully"});
     } catch (error) {
         return res.status(500).json({
             status: 0,
@@ -88,7 +88,7 @@ exports.removeFromCart = async (req, res) => {
             cart = await cart.save();
             return res.status(200).json({ success: true, message: "User item remove from cart sucessfully" });
         } else {
-            return res.status(400).json({ success: false, message: "Cart not found" });
+            return res.status(400).json({ success: false, message: "Cart not found"});
         }
     } catch (err) {
         return res.status(500).json({
@@ -219,10 +219,10 @@ exports.buyNowOrderAndApplyCouponCode = async (req, res) => {
     try {
         const { itemId, itemType, couponCode } = req.body;
         if(!mongoose.Types.ObjectId.isValid(itemId)){
-            return res.status(400).json({ success: false, message: "Invalid item ID" });
+            return res.status(400).json({ success: false, message: "Invalid item ID"});
         }
         if (!itemId || !itemType) {
-            return res.status(400).json({ status: false, message: 'Item ID, and Item Type are required' });
+            return res.status(400).json({ status: false, message: 'Item ID, and Item Type are required'});
         }
         let item, discount, subtotal, totalAmount;
         if (itemType === "Coures") {
