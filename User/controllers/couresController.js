@@ -10,50 +10,77 @@ exports.addCoures = async (req, res) => {
     }
     if (!req.file) {
       return res.status(400).json({
-        status: 0,
+        success: false,
         message: "Missing required parameter - file"
       });
     }
 
-    const result = await cloudinary.uploader.upload_stream({
+    cloudinary.uploader.upload_stream({
       resource_type: 'image'
     }, async (error, result) => {
       if (error) {
         return res.status(500).json({
-          status: 0,
+          success: false,
           message: error.message.toString(),
         });
       }
-      const { couresName,totalPrice, title, discount, description, type } = req.body;
-      const discountedPrice = totalPrice - (totalPrice * (discount / 100));
+
+      const { couresName, totalPrice, title, discount, description, type } = req.body;
+
       const exist = await Coures.findOne({ couresName });
       if (exist) {
         return res.status(400).json({
           success: false,
-          message: "This coures name is already taken!"
-        })
+          message: "This course name is already taken!"
+        });
       }
-      const addCoures = new Coures({
+      if (type === 'paid') {
+        if(!totalPrice || !discount){
+          return res.status(400).json({
+            status:false,
+            message:"Total parice and discount is required"
+          })
+        }
+        const discountedPrice = totalPrice - (totalPrice * (discount / 100));
+        const newCourse = new Coures({
         couresName,
-        price:discountedPrice,
-        title,
-        totalPrice,
-        description,
         discount,
+        totalPrice,
+        title,
+        price:discountedPrice,
+        description,
         type,
-        imageUrl: result.secure_url
-      })
-
-      const saveData = await addCoures.save();
-      return res.status(201).json({ success: true, message: "New coures created  sucessfully" });
+        imageUrl: result.secure_url,
+        })
+        await newCourse.save();
+        
+      return res.status(201).json({ success: true, message: "New course created successfully" });
+      
+      }
+      if (type === 'free') {
+        const newCourse = new Coures({
+        couresName,
+        title,
+        description,
+        type,
+        imageUrl: result.secure_url,
+        })
+        await newCourse.save();
+        
+      return res.status(201).json({ success: true, message: "New course created successfully" });
+      
+      }
+  
     }).end(req.file.buffer);
+
   } catch (error) {
     return res.status(500).json({
-      status: 0,
+      success: false,
       message: error.message.toString(),
-    })
+    });
   }
-}
+};
+
 
 exports.getAllCoures = async (req, res) => {
   try {

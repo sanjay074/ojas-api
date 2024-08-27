@@ -7,16 +7,13 @@ const couresSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: true,
       default: 0
     },
     totalPrice: {
       type: Number,
-      required: true,
     },
     discount: {
       type: Number,
-      required: true,
   },
     title: {
       type: String,
