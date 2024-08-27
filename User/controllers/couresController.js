@@ -212,6 +212,7 @@ exports.updateCoures = async (req, res) => {
         coures.title = req.body.title || coures.title;
         coures.totalPrice=req.body.totalPrice || coures.totalPrice;
         coures.discount=req.body.discount || coures.discount;
+        coures.type=req.body.discount||coures.type;
         await coures.save();
         return res.status(200).json({
             success: true,
