@@ -115,3 +115,33 @@ exports.getAllClassByCourseId = async (req, res) => {
     });
   }
 };
+
+exports.deleteClassList= async (req, res)=>{
+  try{
+     const classID=req.params.id;
+     if(!mongoose.Types.ObjectId.isValid(classID)){
+        return res.status(400).json({
+          status:false,
+          message:"invalid classList Id"})
+     }
+
+     const DeleteId= await Class.findByIdAndDelete(req.params.id)
+     if(!DeleteId){
+      return res.status(400).json({
+        status:false,
+        message:"Class id not found"
+      })
+      
+     }
+     res.status(200).json({
+      status:true,
+      Message:"Class list delete success full"
+    })
+  }catch(error){
+    return res.status(500).json({
+      success: false,
+      message: error.message.toString(),
+    });
+  
+  }
+}
