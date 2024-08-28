@@ -92,6 +92,30 @@ const getFabricData = async (req, res) => {
   }
 };
 
+const  getOneFabric = async (req,res)=>{
+  try {
+    const fabricId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(fabricId)) {
+      return res.status(400).json({ success: false, message: "Invalid fabric ID" });
+    }
+    const getOneFabric = await fabricModal.findById(fabricId);
+    if (!getOneFabric) {
+      return res.status(400).json({
+        success: false,
+        message: "Fabric  not found this Id"
+      })
+    }
+    return res.status(201).json({ success: true, message: "Get one fabric data sucessfully", getOneFabric });
+
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.message.toString(),
+    })
+  }
+
+}
+
 const deleteFabricItem = async (req, res) => {
   try {
       const  fabricId  = req.params.id;
@@ -191,5 +215,6 @@ module.exports = {
   getFabricItem,
   deleteFabricItem,
   updateFabricItem,
-  getFabricData
+  getFabricData,
+  getOneFabric
 };

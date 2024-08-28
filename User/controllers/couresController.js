@@ -175,12 +175,12 @@ exports.updateCoures = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
       return res.status(400).json({ success: false, message: "Invalid course ID" });
     }
-  //   if (!req.file) {
-  //     return res.status(400).json({
-  //         status: 0,
-  //         message: "Missing required parameter - file"
-  //     });
-  // }
+    if (!req.file) {
+      return res.status(400).json({
+          status: 0,
+          message: "Missing required parameter - file"
+      });
+  }
   const coures = await Coures.findById(courseId);
   if(!coures){
     return res.status(404).json({
@@ -218,7 +218,8 @@ exports.updateCoures = async (req, res) => {
             success: true,
             message: "Coures data updated successfully",
         });
-    }).end(req.file.buffer);
+    })
+    .end(req.file.buffer);
 });
 
   } catch (error) {

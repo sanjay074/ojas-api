@@ -92,3 +92,21 @@ exports.deleteCouponById = async (req, res) => {
     }
 };
 
+exports.updateCoupon = async (req, res) => {
+    try {
+        const couponId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(couponId)) {
+            return res.status(400).json({ success: false, message: "Invalid coupon ID" });
+        }
+      const updateCoupon = await Coupon.findByIdAndUpdate(couponId, { $set: req.body }, { new: true });
+      return res.status(200).json({
+        success: true,
+        message: "Coupon data update successfully",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        message: error.toString(),
+      })
+    }
+  }
