@@ -70,7 +70,7 @@ exports.updateClass = async (req, res) => {
 }
 
 
-exports.geOneClass = async (req, res) => {
+exports.getOneClass = async (req, res) => {
   try {
     const classId = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(classId)) {
