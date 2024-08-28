@@ -134,12 +134,12 @@ const deleteFabricItem = async (req, res) => {
 const updateFabricItem = async (req, res) => {
   try {
     const  fabricId  = req.params.id;
-      if (!req.file) {
-          return res.status(400).json({
-              status: 0,
-              message: "Missing required parameter - file"
-          });
-      }
+      // if (!req.file) {
+      //     return res.status(400).json({
+      //         status: 0,
+      //         message: "Missing required parameter - file"
+      //     });
+      // }
       const fabric = await fabricModal.findById(fabricId);
       if (!fabric) {
           return res.status(404).json({
