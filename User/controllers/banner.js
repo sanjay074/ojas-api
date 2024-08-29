@@ -1,6 +1,7 @@
 const Banner = require("../models/banner");
 const cloudinary = require("../../utils/cloudinary");
 const { bannerSchema } = require("../../validators/authValidator");
+const mongoose = require("mongoose");
 exports.uploadBannerImage = async (req, res) => {
     try {
         const { error } = bannerSchema.validate(req.body);
@@ -41,6 +42,7 @@ exports.uploadBannerImage = async (req, res) => {
         });
     }
 };
+
 
 exports.getAllBannerImage = async (req, res) => {
     try {
@@ -84,7 +86,7 @@ exports.deleteBannerImage = async (req, res) => {
             });
         }
 
-        // Extract the public_id from the image URL
+        //Extract the public_id from the image URL
         const imageUrl = banner.imageUrl;
         const publicId = imageUrl.split('/').pop().split('.')[0];
         // Delete the image from Cloudinary
@@ -111,6 +113,31 @@ exports.deleteBannerImage = async (req, res) => {
 };
 
 
+//TODO
+exports.getOnebanner = async (req, res) => {
+    try {
+      const bannerId = req.params.id;
+      if (!mongoose.Types.ObjectId.isValid(bannerId)) {
+        return res.status(400).json({ success: false, message: "Invalid banner ID" });
+      }
+      const getOnebanner = await Banner.findById(bannerId)
+      if (!getOnebanner) {
+        return res.status(400).json({
+          success: false,
+          message: "No any banner"
+        })
+      }
+      return res.status(201).json({ success: true, message: "Get one banner sucessfully",getOnebanner});
+
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        message: error.message.toString(),
+      })
+    }
+  
+  }
+  
 
 
 exports.updateBannerImage = async (req, res) => {
