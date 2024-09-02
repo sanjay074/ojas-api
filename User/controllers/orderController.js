@@ -248,6 +248,41 @@ exports.adminGetOrderDetails = async (req, res) => {
     }
 }
 
+
+exports.getOneOrderDetails = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({
+                status: 0,
+                message: "Order id invaild"
+            })
+        }
+        const order = await Order.findById(orderId).populate('userId', 'name email')
+            .populate('userAddress')
+            .populate('products.productId', 'name price');
+
+        if (order.length === 0) {
+            return res.status(400).json({
+                status: false,
+                message: "No  available any order details", order
+            })
+        }
+        return res.status(200).json({
+            status: true,
+            message: "Order fetched successfully",
+            order,
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            status: false,
+            message: error.toString()
+        })
+    }
+}
+
+
 exports.adminUpdateOrderStatus = async (req, res) => {
     try {
         const orderId = req.params.id;
