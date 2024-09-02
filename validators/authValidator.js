@@ -233,25 +233,13 @@ const couponValidationSchema = Joi.object({
   })
 });
 
-
-
-
-
 const orderSchema = Joi.object({
-  // userId: Joi.string()
-  //   .pattern(/^[0-9a-fA-F]{24}$/)
-  //   .required()
-  //   .messages({
-  //     'string.base': 'User ID should be a string',
-  //     'string.pattern.base': 'User ID should be a valid MongoDB ObjectId',
-  //     'any.required': 'User ID is required',
-  //   }),
   userAddress: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .required()
     .messages({
       'string.base': 'User Address id should be a string',
-      'string.pattern.base': 'User ID should be a valid MongoDB ObjectId',
+      'string.pattern.base': 'User ID should be a valid  ObjectId',
       'any.required': 'User Address id is required',
     }),
   products: Joi.array()
@@ -262,16 +250,29 @@ const orderSchema = Joi.object({
           .required()
           .messages({
             'string.base': 'Product ID should be a string',
-            'string.pattern.base': 'Product ID should be a valid MongoDB ObjectId',
+            'string.pattern.base': 'Product ID should be a valid  ObjectId',
             'any.required': 'Product ID is required',
+          }),
+        itemType: Joi.string()
+          .valid('Coures', 'Fabric')
+          .required()
+          .messages({
+            'string.base': 'Item type should be a string',
+            'any.only': 'Item type must be either "Coures" or "Fabric"',
+            'any.required': 'Item type is required',
           }),
         quantity: Joi.number()
           .min(1)
-          .required()
+          .when('itemType', {
+            is: 'Fabric',
+            then: Joi.required(),
+            otherwise: Joi.forbidden()
+          })
           .messages({
             'number.base': 'Quantity should be a number',
             'number.min': 'Quantity must be at least 1',
-            'any.required': 'Quantity is required',
+            'any.required': 'Quantity is required for Fabric',
+            'any.unknown': 'Quantity is not allowed for Coures',
           })
       })
     )
@@ -283,6 +284,8 @@ const orderSchema = Joi.object({
       'any.required': 'Products are required',
     })
 });
+
+
 
 
 
