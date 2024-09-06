@@ -144,7 +144,9 @@ exports.getAllClassByCourseId = async (req, res) => {
     }
 
     let classes = await Class.find({ courseId: new mongoose.Types.ObjectId(courseId) }).populate("courseId");
-    
+    if (classes.length === 0) {
+      return res.status(400).json({ status: 0, message: "No classes found for this course" });
+    }
 
     if (!hasAccess) {
       classes = classes.map((classItem) => {
