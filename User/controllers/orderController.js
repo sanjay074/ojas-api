@@ -3,6 +3,7 @@ const Order = require("../models/order");
 const User = require("../models/user");
 const Fabric = require("../models/fabricStore");
 const Coures = require("../models/coures");
+const Purchase = require("../models/purchase");
 const mongoose = require("mongoose");
 const { userAddressJoiSchema, updateUserAddressJoiSchema, orderSchema } = require("../../validators/authValidator");
 
@@ -376,9 +377,30 @@ exports.findByUserIdAndDeliveredOrder = async (req, res) => {
 }
 
 
-
-
-
-
-
-
+exports.savePurchase = async (req,res)=>{
+    try{
+      const {courseId,paymentId} = req.body;
+      const userId= req.user.id
+      const course = await Coures.findOne({_id:courseId});
+    if (!course) {
+      return res.status(404).json({ status:0, message: "Course not found" });
+    }
+    const existingPurchase = await Purchase.findOne({ userId, courseId });
+    if (existingPurchase) {
+      return res.status(400).json({status:0, message: "Course already purchased" });
+    }
+    const newPurchase = new Purchase({
+      userId,
+      courseId,
+      purchaseDate: new Date(),
+      paymentId, 
+    });
+    await newPurchase.save();
+    return res.status(200).json({status:1, message: "Purchase successful"});
+     }catch(error){
+        return res.status(200).json({
+            status: false,
+            message: error.toString()
+        })
+     }
+}

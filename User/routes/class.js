@@ -7,7 +7,7 @@ router.post("/addClass",verifyTokenAndAdmin,addClass);
 router.get("/getAllClass",verifyTokenAndAdmin,getAllClass);
 router.put("/updateClass/:id",verifyTokenAndAdmin,updateClass);
 router.get("/getOneClass/:id",verifyTokenAndAdmin,getOneClass);
-router.get("/classes/:courseId",getAllClassByCourseId);
+router.get("/classes/:courseId",verifyTokenAndUser,getAllClassByCourseId);
 router.delete('/deleteClassList/:id', verifyTokenAndAdmin,deleteClassList);
 
 module.exports = router;

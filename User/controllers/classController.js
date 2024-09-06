@@ -1,4 +1,6 @@
 const Class = require('../models/class');
+const Coures = require("../models/coures");
+const Purchase = require("../models/purchase");
 const mongoose = require('mongoose');
 const { addClassSchema } = require('../../validators/authValidator');
 exports.addClass = async (req, res) => {
@@ -7,7 +9,7 @@ exports.addClass = async (req, res) => {
     if (error) {
       return res.status(400).json(error.details[0].message);
     }
-    const { courseId, classNo, description, classyoutubelink, videoWatchTime, className } = req.body
+    const { courseId, classNo, description, classyoutubelink, videoWatchTime, className,isDemo } = req.body
     const exist = await Class.findOne({ classNo, courseId });
     if (exist) {
       return res.status(400).json({
@@ -16,7 +18,7 @@ exports.addClass = async (req, res) => {
       });
     }
     const addClass = new Class({
-      courseId, classNo, description, classyoutubelink, videoWatchTime, className
+      courseId, classNo, description, classyoutubelink, videoWatchTime, className,isDemo
 
     })
     const saveData = await addClass.save();
@@ -95,26 +97,70 @@ exports.getOneClass = async (req, res) => {
 }
 
 
+// exports.getAllClassByCourseId = async (req, res) => {
+//   try {
+//     const { courseId } = req.params;
+//     if (!mongoose.Types.ObjectId.isValid(courseId)) {
+//       return res.status(400).json({ success: false, message: 'Invalid course ID format' });
+//     }
+
+//     const classList = await Class.find({ courseId: new mongoose.Types.ObjectId(courseId) }).populate("courseId");
+//     if (classList.length === 0) {
+//       console.log('No classes found for this course ID');
+//       return res.status(404).json({ success: false, message: 'No classes available for this course ID' });
+//     }
+//     return res.status(200).json({ success: true, message: "Retrieved all classes successfully", classList });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
+
 exports.getAllClassByCourseId = async (req, res) => {
+  const { courseId } = req.params;
+  const userId = req.user.id;
+
   try {
-    const { courseId } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(courseId)) {
-      return res.status(400).json({ success: false, message: 'Invalid course ID format' });
+    const course = await Coures.findOne({ _id: courseId }); 
+    if (!course) {
+      return res.status(404).json({ status: 0, message: "Course not found" });
     }
 
-    const classList = await Class.find({ courseId: new mongoose.Types.ObjectId(courseId) }).populate("courseId");
-    if (classList.length === 0) {
-      console.log('No classes found for this course ID');
-      return res.status(404).json({ success: false, message: 'No classes available for this course ID' });
+    let hasAccess = false;
+    if (course.type === "free") {
+      hasAccess = true;
+    } else {
+      const purchase = await Purchase.findOne({ userId, courseId });  
+      if(!purchase){
+        hasAccess=false;
+      }
+      
+      if (purchase) {
+        hasAccess = true;
+      }
     }
-    return res.status(200).json({ success: true, message: "Retrieved all classes successfully", classList });
+
+    let classes = await Class.find({ courseId: new mongoose.Types.ObjectId(courseId) }).populate("courseId");
+    
+
+    if (!hasAccess) {
+      classes = classes.map((classItem) => {
+        if (!classItem.isDemo) {
+          classItem.classyoutubelink = undefined;
+        }
+        return classItem;
+      });
+    }
+
+    return res.status(200).json({status:1,message:"Retrieved all classes successfully",classes});
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ message: error.message });
   }
 };
+
 
 exports.deleteClassList= async (req, res)=>{
   try{
