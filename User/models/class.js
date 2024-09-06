@@ -24,6 +24,10 @@ const classSchema = new mongoose.Schema(
     },
     videoWatchTime: {
       type: String,
+    },
+    isDemo: {
+      type: Boolean,
+      default: false,
     }
   },
   { timestamps: true }

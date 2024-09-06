@@ -68,7 +68,8 @@ const addClassSchema = Joi.object({
   description: Joi.number().required(),
   classyoutubelink: Joi.string().required(),
   description: Joi.string().required(),
-  videoWatchTime: Joi.string().required()
+  videoWatchTime: Joi.string().required(),
+  isDemo:Joi.boolean().required(),
 })
 
 
