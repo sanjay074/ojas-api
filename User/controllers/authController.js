@@ -71,7 +71,7 @@ exports.verifyOTP = async (req, res) => {
           return res.status(200).send({ message: "Registered successfully", token });
         } catch (e) {
           console.error(e);
-          return res.status(500).send({ message: "Something bad happened" });
+          return res.status(500).send({ message: "Something bad happened"});
         }
       }
     }
@@ -114,7 +114,6 @@ exports.verifyOTP = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 
 
 
