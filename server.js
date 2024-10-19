@@ -42,6 +42,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 
 app.use("/api/auth", Auth);
 app.use("/api/auth", AdminAuth);
