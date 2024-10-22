@@ -246,7 +246,7 @@ exports.updateImage = async (req, res) => {
                 message: `File size exceeds the limit of ${MAX_FILE_SIZE_MB} MB`,
             });
         }
-
+        
         // Create file URL based on file type
         let fileUrl;
         if (req.file.mimetype.startsWith('video')) {
